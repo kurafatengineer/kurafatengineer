@@ -1,3 +1,4 @@
+HTML  CSS  JS Result  
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,33 +6,28 @@
 <title>PYQs Quiz</title>
 
 <link rel="stylesheet"
- href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
-<link rel="stylesheet" href="css/common.css">
-<link rel="stylesheet" href="css/quiz.css">
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
-<!-- ================= HEADER ================= -->
+  
+<!-- HEADER -->
 <header class="main-header">
   <h1>Rahul Kumar</h1>
   <div class="header-line"></div>
 </header>
-
-<!-- ================= NAV BUTTON ================= -->
-<a class="back-btn" href="index.html">⬅ Home</a>
-
-<!-- ================= TOGGLES ================= -->
+  
+<!-- FILTER TOGGLE -->
 <button id="filterToggle"><i class="fas fa-sliders-h"></i></button>
+
+<!-- STATS TOGGLE -->
 <button id="statsToggle"><i class="fas fa-chart-bar"></i></button>
 
 <div id="app">
 
-  <!-- ================= FILTER SIDEBAR ================= -->
+  <!-- FILTER SIDEBAR -->
   <aside id="filter-sidebar">
-
-    <!-- Each filter section -->
     <div class="filter-section">
       <h4 onclick="toggleSection('yearBox')">Year</h4>
       <div id="yearBox" class="filter-content">
@@ -71,12 +67,10 @@
         <div id="subjectList" class="filter-list"></div>
       </div>
     </div>
-
   </aside>
 
-  <!-- ================= QUIZ CONTAINER ================= -->
+  <!-- QUIZ -->
   <main id="quiz-container">
-
     <div id="question-card">
       <div id="question"></div>
     </div>
@@ -86,12 +80,11 @@
     <button id="skipBtn">Skip</button>
 
     <div class="legend">
-      C: Correct | I: Incorrect | S: Skipped | U: Unattempted
+      C: Correct &nbsp; I: Incorrect &nbsp; S: Skipped &nbsp; U: Unattempted
     </div>
-
   </main>
 
-  <!-- ================= STATS PANEL ================= -->
+  <!-- STATS -->
   <aside id="stats-panel">
     <h3>Progress Report</h3>
 
@@ -102,12 +95,21 @@
   </aside>
 
 </div>
-
-<!-- ================= FOOTER ================= -->
+  <!-- FOOTER -->
 <footer class="footer">
   <div class="footer-line"></div>
+  <div class="social-icons">
+    <a href="#"><i class="fab fa-telegram"></i></a>
+    <a href="#"><i class="fab fa-youtube"></i></a>
+    <a href="#"><i class="fab fa-facebook"></i></a>
+    <a href="#"><i class="fab fa-instagram"></i></a>
+    <a href="#"><i class="fab fa-snapchat"></i></a>
+    <a href="#"><i class="fab fa-x-twitter"></i></a>
+    <a href="#"><i class="fab fa-whatsapp"></i></a>
+  </div>
 </footer>
+  
 
-<script src="js/quiz.js"></script>
+<script src="js/script.js"></script>
 </body>
 </html>
