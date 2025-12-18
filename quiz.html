@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PYQs Quiz</title>
+
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/quiz.css">
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="main-header">
+  <h1>Rahul Kumar</h1>
+  <div class="header-line"></div>
+</header>
+
+<!-- ================= NAV BUTTON ================= -->
+<a class="back-btn" href="index.html">⬅ Home</a>
+
+<!-- ================= TOGGLES ================= -->
+<button id="filterToggle"><i class="fas fa-sliders-h"></i></button>
+<button id="statsToggle"><i class="fas fa-chart-bar"></i></button>
+
+<div id="app">
+
+  <!-- ================= FILTER SIDEBAR ================= -->
+  <aside id="filter-sidebar">
+
+    <!-- Each filter section -->
+    <div class="filter-section">
+      <h4 onclick="toggleSection('yearBox')">Year</h4>
+      <div id="yearBox" class="filter-content">
+        <input type="text" placeholder="Search" onkeyup="filterList(this,'yearList')">
+        <div id="yearList" class="filter-list"></div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h4 onclick="toggleSection('topicBox')">Topic</h4>
+      <div id="topicBox" class="filter-content">
+        <input type="text" placeholder="Search" onkeyup="filterList(this,'topicList')">
+        <div id="topicList" class="filter-list"></div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h4 onclick="toggleSection('examBox')">Exam</h4>
+      <div id="examBox" class="filter-content">
+        <input type="text" placeholder="Search" onkeyup="filterList(this,'examList')">
+        <div id="examList" class="filter-list"></div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h4 onclick="toggleSection('paperBox')">Paper</h4>
+      <div id="paperBox" class="filter-content">
+        <input type="text" placeholder="Search" onkeyup="filterList(this,'paperList')">
+        <div id="paperList" class="filter-list"></div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h4 onclick="toggleSection('subjectBox')">Subject</h4>
+      <div id="subjectBox" class="filter-content">
+        <input type="text" placeholder="Search" onkeyup="filterList(this,'subjectList')">
+        <div id="subjectList" class="filter-list"></div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ================= QUIZ CONTAINER ================= -->
+  <main id="quiz-container">
+
+    <div id="question-card">
+      <div id="question"></div>
+    </div>
+
+    <div id="options"></div>
+
+    <button id="skipBtn">Skip</button>
+
+    <div class="legend">
+      C: Correct | I: Incorrect | S: Skipped | U: Unattempted
+    </div>
+
+  </main>
+
+  <!-- ================= STATS PANEL ================= -->
+  <aside id="stats-panel">
+    <h3>Progress Report</h3>
+
+    <div class="stat"><span>C</span><div class="bar"><div id="bar-c"></div></div><span id="count-c">0</span></div>
+    <div class="stat"><span>I</span><div class="bar"><div id="bar-i"></div></div><span id="count-i">0</span></div>
+    <div class="stat"><span>S</span><div class="bar"><div id="bar-s"></div></div><span id="count-s">0</span></div>
+    <div class="stat"><span>U</span><div class="bar"><div id="bar-u"></div></div><span id="count-u">0</span></div>
+  </aside>
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="footer-line"></div>
+</footer>
+
+<script src="js/quiz.js"></script>
+</body>
+</html>
