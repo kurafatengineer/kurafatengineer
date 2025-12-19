@@ -1,4 +1,5 @@
-HTML  CSS  JS Result  
+document.addEventListener("DOMContentLoaded", () => {
+
 /**************** CONFIG ****************/
 const SHEET_ID = "1--MzYQ98U_dSVmdDwY-aGAxba2XgiLXJlttJvLPtQvU";
 const SHEET_NAME = "PYQS";
@@ -190,16 +191,18 @@ function updateStats() {
 }
 
 /**************** HELPERS ****************/
-function toggleSection(id) {
+window.toggleSection = function(id) {
   const el = document.getElementById(id);
   el.style.display = el.style.display === "block" ? "none" : "block";
-}
+};
 
-function filterList(input, id) {
+window.filterList = function(input, id) {
   const v = input.value.toLowerCase();
   document.querySelectorAll(`#${id} label`)
     .forEach(l => {
       l.style.display =
         l.textContent.toLowerCase().includes(v) ? "" : "none";
     });
-}
+};
+
+});
