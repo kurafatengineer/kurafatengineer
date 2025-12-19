@@ -19,46 +19,42 @@ body {
   width: 100%;
   background: #000;
   z-index: 1000;
-  text-align: center;
 }
 
-/* top thin line */
-.site-header::before {
-  content: "";
-  display: block;
-  width: 100%;
+/* header container */
+.header-decor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 18px 0;
+}
+
+/* horizontal lines */
+.header-decor .line {
+  flex: 1;
+  max-width: 120px;
   height: 1px;
   background: #fff;
+  opacity: 0.9;
 }
 
-/* bottom decorative line */
-.site-header::after {
-  content: "";
-  display: block;
-  width: 55%;
-  height: 1px;
-  background: #fff;
-  margin: 10px auto 0;
+/* center icon */
+.header-icon {
+  font-size: 22px;
+  color: #fff;
+  transition: transform 0.3s ease, text-shadow 0.3s ease;
 }
 
-/* title */
-.site-title {
-  padding: 18px 0 12px;
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  position: relative;
-}
-
-/* subtle hover glow (still white) */
-.site-title:hover {
-  text-shadow: 0 0 8px rgba(255,255,255,0.4);
+/* hover effect */
+.header-icon:hover {
+  transform: scale(1.15);
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
 }
 
 /* Space for fixed header */
 main {
-  padding-top: 110px;
+  padding-top: 85px;
 }
 
 /* ================= FOOTER ================= */
@@ -66,10 +62,9 @@ main {
   background: #000;
   text-align: center;
   padding: 36px 16px 26px;
-  position: relative;
 }
 
-/* footer top divider */
+/* footer divider */
 .site-footer::before {
   content: "";
   display: block;
@@ -97,7 +92,7 @@ main {
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* animated circle underline */
+/* dot indicator */
 .social-links a::after {
   content: "";
   position: absolute;
@@ -130,13 +125,12 @@ main {
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 600px) {
-  .site-title {
-    font-size: 20px;
-    letter-spacing: 2px;
+  .header-decor .line {
+    max-width: 80px;
   }
 
   main {
-    padding-top: 95px;
+    padding-top: 75px;
   }
 
   .social-links {
