@@ -1,205 +1,271 @@
-document.addEventListener("DOMContentLoaded", () => {
+const SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/1--MzYQ98U_dSVmdDwY-aGAxba2XgiLXJlttJvLPtQvU/gviz/tq?tqx=out:csv";
 
-  /* ================= FILTER TOGGLE ================= */
-  document.querySelectorAll(".filter-group h4").forEach(h => {
-    h.addEventListener("click", () => {
-      h.parentElement.classList.toggle("open");
-    });
-  });
+const MAINS_PAPERS = [
+    "GS Paper 01","GS Paper 02","GS Paper 03","GS Paper 04",
+    "Essay","English","Optional 01","Optional 02"
+];
 
-  /* ================= CONFIG ================= */
-  const SHEET_ID = "1--MzYQ98U_dSVmdDwY-aGAxba2XgiLXJlttJvLPtQvU";
-  const SHEET_NAME = "PYQs";
-  const SHEET_URL =
-    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+let rawData = [];
+let filteredData = [];
+let currentIndex = 0;
+let medium = "English";
+let soundOn = true;
 
-  /* ================= STATE ================= */
-  let allQuestions = [];
-  let questions = [];
-  let index = 0;
-  let answered = false;
-  let stats = { c: 0, i: 0, s: 0, u: 0 };
+let progress = {
+    C: 0,
+    I: 0,
+    S: 0,
+    U: 0
+};
 
-  /* ================= FETCH ================= */
-  fetch(SHEET_URL)
-    .then(r => r.text())
-    .then(t => {
-      const json = JSON.parse(t.substring(47).slice(0, -2));
-
-      json.table.rows.forEach(r => {
-        if (!r.c[4] || !r.c[11]) return;
-
-        allQuestions.push({
-          exam: r.c[0]?.v || "",
-          year: String(r.c[1]?.v || ""),
-          paper: r.c[2]?.v || "",
-          questionRaw: r.c[4].v,
-          correct: r.c[11].v.toLowerCase(),
-          subject: r.c[12]?.v || "",
-          topic: r.c[13]?.v || ""
-        });
-      });
-
-      questions = [...allQuestions];
-      stats.u = questions.length;
-
-      populateFilters();
-      updateStats();
-      showQuestion();
-    });
-
-  /* ================= FILTERS ================= */
-  function populateFilters() {
-    fillFilter("filter-exam", "exam");
-    fillFilter("filter-year", "year");
-    fillFilter("filter-paper", "paper");
-    fillFilter("filter-subject", "subject");
-    fillFilter("filter-topic", "topic");
-  }
-
-  function fillFilter(id, key) {
-    const box = document.getElementById(id);
-    box.innerHTML = "";
-
-    [...new Set(allQuestions.map(q => q[key]).filter(Boolean))]
-      .sort()
-      .forEach(v => {
-        box.innerHTML += `
-          <label>
-            <input type="checkbox" value="${v}">
-            ${v}
-          </label>`;
-      });
-  }
-
-  /* ================= FILTER SEARCH ================= */
-  document.querySelectorAll(".filter-group input[type='text']")
-    .forEach(input => {
-      input.addEventListener("input", () => {
-        const list = input.parentElement.querySelector(".filter-list");
-        const term = input.value.toLowerCase();
-
-        list.querySelectorAll("label").forEach(l => {
-          l.style.display =
-            l.innerText.toLowerCase().includes(term) ? "flex" : "none";
-        });
-      });
-    });
-
-  /* ================= FILTER APPLY ================= */
-  document.addEventListener("change", e => {
-    if (e.target.type !== "checkbox") return;
-
-    const get = id =>
-      [...document.querySelectorAll(`#${id} input:checked`)]
-        .map(i => i.value);
-
-    questions = allQuestions.filter(q =>
-      (!get("filter-exam").length || get("filter-exam").includes(q.exam)) &&
-      (!get("filter-year").length || get("filter-year").includes(q.year)) &&
-      (!get("filter-paper").length || get("filter-paper").includes(q.paper)) &&
-      (!get("filter-subject").length || get("filter-subject").includes(q.subject)) &&
-      (!get("filter-topic").length || get("filter-topic").includes(q.topic))
-    );
-
-    index = 0;
-    stats = { c: 0, i: 0, s: 0, u: questions.length };
-    updateStats();
-    showQuestion();
-  });
-
-  /* ================= QUESTION ================= */
-  function showQuestion() {
-    answered = false;
-
-    if (index >= questions.length) {
-      showResult();
-      return;
-    }
-
-    const q = questions[index];
-
-    document.getElementById("exam-info").innerText =
-      `${q.exam} ${q.year}`.trim();
-    document.getElementById("exam-paper").innerText = q.paper;
-
-    const options = [];
-    const regex = /\(([a-e])\)\s*([^()]+)/gi;
-    let match;
-
-    while ((match = regex.exec(q.questionRaw)) !== null) {
-      options.push({ key: match[1].toLowerCase(), text: match[2].trim() });
-    }
-
-    const questionText = q.questionRaw.split(/\([a-e]\)/i)[0].trim();
-    document.getElementById("question").innerText = questionText;
-
-    const optBox = document.getElementById("options");
-    optBox.innerHTML = "";
-
-    if (!options.length) {
-      optBox.innerHTML =
-        `<div style="font-size:13px;opacity:.7">Options not available</div>`;
-      return;
-    }
-
-    options.forEach(o => {
-      const b = document.createElement("button");
-      b.className = "option-btn";
-      b.dataset.key = o.key;
-      b.innerText = `${o.key.toUpperCase()}. ${o.text}`;
-      b.onclick = () => answer(b);
-      optBox.appendChild(b);
-    });
-  }
-
-  /* ================= ANSWER ================= */
-  function answer(btn) {
-    if (answered) return;
-    answered = true;
-    stats.u--;
-
-    const correct = questions[index].correct;
-
-    document.querySelectorAll(".option-btn").forEach(b => {
-      b.disabled = true;
-      if (b.dataset.key === correct) b.classList.add("correct");
-      if (b === btn && b.dataset.key !== correct) b.classList.add("wrong");
-    });
-
-    btn.dataset.key === correct ? stats.c++ : stats.i++;
-    updateStats();
-    setTimeout(next, 1200);
-  }
-
-  /* ================= SKIP ================= */
-  document.getElementById("skipBtn").onclick = () => {
-    if (answered) return;
-    answered = true;
-    stats.u--;
-    stats.s++;
-    updateStats();
-    next();
-  };
-
-  function next() {
-    index++;
-    showQuestion();
-  }
-
-  /* ================= STATS ================= */
-  function updateStats() {
-    const total = stats.c + stats.i + stats.s + stats.u || 1;
-    ["c", "i", "s", "u"].forEach(k => {
-      document.getElementById(`count-${k}`).innerText = stats[k];
-      document.getElementById(`bar-${k}`).style.width =
-        (stats[k] / total) * 100 + "%";
-    });
-  }
-
-  /* ================= RESULT ================= */
-  function showResult() {
-    document.getElementById("resultOverlay").style.display = "flex";
-  }
-
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadHeaderFooter();
+    await loadData();
+    setupToggles();
+    setupMediumToggle();
+    initFilters();
+    applyFilters();
 });
+
+async function loadHeaderFooter() {
+    document.getElementById("header").innerHTML =
+        await fetch("partials/header.html").then(r => r.text());
+    document.getElementById("footer").innerHTML =
+        await fetch("partials/footer.html").then(r => r.text());
+}
+
+async function loadData() {
+    const csv = await fetch(SHEET_URL).then(r => r.text());
+    const rows = csv.split("\n").map(r => r.split(","));
+    const headers = rows.shift();
+
+    rawData = rows.map(r => ({
+        exam: r[0]?.replace(/"/g,"").split("\n"),
+        year: r[1]?.replace(/"/g,"").split("\n"),
+        paper: r[2]?.replace(/"/g,""),
+        qEn: r[4]?.replace(/"/g,""),
+        qHi: r[10]?.replace(/"/g,""),
+        correct: r[11]?.replace(/"/g,""),
+        subject: r[12]?.replace(/"/g,""),
+        topic: r[13]?.replace(/"/g,""),
+        status: "U"
+    }));
+
+    progress.U = rawData.length;
+}
+
+function setupToggles() {
+    document.getElementById("filterToggle").onclick = () => {
+        toggleDisplay("filters");
+    };
+    document.getElementById("progressToggle").onclick = () => {
+        toggleDisplay("progress");
+    };
+    document.getElementById("soundToggle").onclick = (e) => {
+        soundOn = !soundOn;
+        e.target.textContent = soundOn ? "Sound: ON" : "Sound: OFF";
+    };
+}
+
+function setupMediumToggle() {
+    document.querySelectorAll("input[name='medium']").forEach(r => {
+        r.onchange = () => {
+            medium = r.value;
+            renderQuestion();
+        };
+    });
+}
+
+function initFilters() {
+    document.querySelectorAll(".filter").forEach(filter => {
+        const type = filter.dataset.filter;
+        const values = new Set();
+
+        rawData.forEach(d => {
+            if (type === "Year") d.year.forEach(v => values.add(v));
+            if (type === "Exam") d.exam.forEach(v => values.add(v));
+            if (type === "Paper") values.add(d.paper);
+            if (type === "Subject") values.add(d.subject);
+            if (type === "Topic") values.add(d.topic);
+        });
+
+        const optionsDiv = filter.querySelector(".options");
+        [...values].sort().forEach(v => {
+            const label = document.createElement("label");
+            label.innerHTML = `<input type="checkbox" value="${v}"> ${v}`;
+            optionsDiv.appendChild(label);
+        });
+
+        filter.querySelectorAll("input[type='checkbox']").forEach(cb => {
+            cb.onchange = applyFilters;
+        });
+
+        filter.querySelector("input[type='text']").oninput = e => {
+            const q = e.target.value.toLowerCase();
+            optionsDiv.querySelectorAll("label").forEach(l => {
+                l.style.display = l.textContent.toLowerCase().includes(q)
+                    ? "block" : "none";
+            });
+        };
+    });
+}
+
+function applyFilters() {
+    filteredData = rawData.filter(d => {
+        return matchFilter("Year", d.year) &&
+               matchFilter("Exam", d.exam) &&
+               matchFilter("Paper", [d.paper]) &&
+               matchFilter("Subject", [d.subject]) &&
+               matchFilter("Topic", [d.topic]);
+    });
+
+    resetProgress();
+    currentIndex = 0;
+
+    if (filteredData.length === 0) return;
+
+    if (MAINS_PAPERS.includes(filteredData[0].paper)) {
+        showMains();
+    } else {
+        showQuiz();
+    }
+}
+
+function matchFilter(type, values) {
+    const checked = [...document.querySelectorAll(`.filter[data-filter="${type}"] input[type="checkbox"]:checked`)]
+        .map(cb => cb.value);
+    if (checked.length === 0) return true;
+    return values.some(v => checked.includes(v));
+}
+
+function showQuiz() {
+    toggleDisplay("quiz", true);
+    toggleDisplay("mains", false);
+    toggleDisplay("progress", true);
+    renderQuestion();
+}
+
+function showMains() {
+    toggleDisplay("quiz", false);
+    toggleDisplay("progress", false);
+    toggleDisplay("result", false);
+    toggleDisplay("mains", true);
+
+    const div = document.getElementById("mainsContent");
+    div.innerHTML = "";
+    filteredData.forEach(d => {
+        const p = document.createElement("p");
+        p.textContent = d.qEn;
+        div.appendChild(p);
+    });
+}
+
+function renderQuestion() {
+    if (!filteredData[currentIndex]) return;
+
+    const q = filteredData[currentIndex];
+    const text = medium === "English" ? q.qEn : q.qHi;
+
+    const parts = splitQuestion(text);
+
+    document.getElementById("quizMeta").textContent =
+        `${q.exam.join(", ")} - ${q.year.join(", ")} | ${q.paper}`;
+
+    document.getElementById("question").textContent = parts.question;
+
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+
+    parts.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => answer(opt[1].toLowerCase(), q.correct);
+        optionsDiv.appendChild(btn);
+    });
+
+    document.getElementById("skipBtn").onclick = skip;
+}
+
+function splitQuestion(text) {
+    const lines = text.split("\n");
+    const qLines = [];
+    const opts = [];
+
+    lines.forEach(l => {
+        if (l.trim().match(/^\([a-e]\)/i)) opts.push(l.trim());
+        else qLines.push(l);
+    });
+
+    return {
+        question: qLines.join("\n"),
+        options: opts
+    };
+}
+
+function answer(selected, correct) {
+    const q = filteredData[currentIndex];
+    q.status = selected === correct ? "C" : "I";
+    next();
+}
+
+function skip() {
+    filteredData[currentIndex].status = "S";
+    next();
+}
+
+function next() {
+    currentIndex++;
+    updateProgress();
+
+    if (progress.U === 0) {
+        showResult();
+    } else {
+        renderQuestion();
+    }
+}
+
+function resetProgress() {
+    progress = { C:0, I:0, S:0, U:filteredData.length };
+    filteredData.forEach(d => d.status = "U");
+    updateProgress();
+}
+
+function updateProgress() {
+    progress = { C:0, I:0, S:0, U:0 };
+    filteredData.forEach(d => progress[d.status]++);
+    document.getElementById("progressStats").textContent =
+        `C:${progress.C} I:${progress.I} S:${progress.S} U:${progress.U}`;
+}
+
+function showResult() {
+    ["filters","quiz","progress","mains","toggles"].forEach(id => toggleDisplay(id,false));
+    toggleDisplay("result", true);
+    drawChart();
+
+    document.getElementById("restart").onclick = () => location.reload();
+}
+
+function drawChart() {
+    const ctx = document.getElementById("resultChart").getContext("2d");
+    const total = progress.C + progress.I + progress.S + progress.U;
+    let start = 0;
+
+    [["C","green"],["I","red"],["S","orange"],["U","gray"]].forEach(([k,color]) => {
+        const val = progress[k] / total * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(150,150);
+        ctx.arc(150,150,140,start,start+val);
+        ctx.fillStyle = color;
+        ctx.fill();
+        start += val;
+    });
+}
+
+function toggleDisplay(id, show) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = show === undefined
+        ? (el.style.display === "none" ? "block" : "none")
+        : (show ? "block" : "none");
+}
