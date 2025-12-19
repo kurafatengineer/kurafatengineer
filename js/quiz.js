@@ -1,12 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-/**************** CONFIG ****************/
+/* ================= CONFIG ================= */
 const SHEET_ID = "1--MzYQ98U_dSVmdDwY-aGAxba2XgiLXJlttJvLPtQvU";
 const SHEET_NAME = "PYQS";
 const SHEET_URL =
   `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
 
-/**************** STATE ****************/
+/* ================= STATE ================= */
 let allQuestions = [];
 let questions = [];
 let index = 0;
@@ -14,23 +14,7 @@ let answered = false;
 
 let stats = { c: 0, i: 0, s: 0, u: 0 };
 
-/**************** DOM ****************/
-const filterSidebar = document.getElementById("filter-sidebar");
-const statsPanel = document.getElementById("stats-panel");
-
-/**************** TOGGLES ****************/
-document.getElementById("filterToggle").onclick = () => {
-  filterSidebar.classList.toggle("open");
-  document.querySelectorAll(".filter-content")
-    .forEach(fc => fc.style.display = "none");
-};
-
-document.getElementById("statsToggle").onclick = () => {
-  statsPanel.classList.toggle("open");
-  document.body.classList.toggle("stats-open");
-};
-
-/**************** FETCH ****************/
+/* ================= FETCH ================= */
 fetch(SHEET_URL)
   .then(r => r.text())
   .then(t => {
@@ -50,120 +34,35 @@ fetch(SHEET_URL)
       });
     });
 
-    populateFilters();
     questions = [...allQuestions];
     stats.u = questions.length;
     updateStats();
     showQuestion();
   });
 
-/**************** FILTERS ****************/
-function populateFilters() {
-  fill("yearList", "year");
-  fill("topicList", "topic");
-  fill("examList", "exam");
-  fill("paperList", "paper");
-  fill("subjectList", "subject");
-}
-
-function fill(id, key) {
-  const el = document.getElementById(id);
-  el.innerHTML = "";
-
-  [...new Set(allQuestions.map(q => q[key]).filter(Boolean))]
-    .sort()
-    .forEach(v => {
-      el.innerHTML +=
-        `<label><input type="checkbox" value="${v}"> ${v}</label>`;
-    });
-}
-
-document.addEventListener("change", e => {
-  if (e.target.type !== "checkbox") return;
-
-  const get = id =>
-    [...document.querySelectorAll(`#${id} input:checked`)]
-      .map(i => i.value);
-
-  questions = allQuestions.filter(q =>
-    (!get("yearList").length || get("yearList").includes(q.year)) &&
-    (!get("topicList").length || get("topicList").includes(q.topic)) &&
-    (!get("examList").length || get("examList").includes(q.exam)) &&
-    (!get("paperList").length || get("paperList").includes(q.paper)) &&
-    (!get("subjectList").length || get("subjectList").includes(q.subject))
-  );
-
-  index = 0;
-  stats = { c: 0, i: 0, s: 0, u: questions.length };
-  updateStats();
-  showQuestion();
-});
-
-/**************** QUESTION ****************/
+/* ================= QUESTION ================= */
 function showQuestion() {
   answered = false;
-  const optionsDiv = document.getElementById("options");
-  optionsDiv.innerHTML = "";
-
   if (index >= questions.length) return;
 
   const q = questions[index];
-
   document.getElementById("question").innerText =
     q.text.replace(/\([a-eA-E]\)[\s\S]*/, "").trim();
-
-  const regex = /\(([a-eA-E])\)\s*([^()]+)(?=\s*\([a-eA-E]\)|$)/g;
-
-  [...q.text.matchAll(regex)].forEach(m => {
-    const btn = document.createElement("button");
-    btn.className = "option-btn";
-    btn.dataset.key = m[1].toLowerCase();
-
-    btn.innerHTML = `
-      <div class="option-left">
-        <div class="option-circle">${m[1].toUpperCase()}</div>
-        <div>${m[2]}</div>
-      </div>
-      <div class="icon"></div>
-    `;
-
-    btn.onclick = () => answer(btn);
-    optionsDiv.appendChild(btn);
-  });
 }
 
-/**************** ANSWER ****************/
-function answer(btn) {
+/* ================= ANSWER ================= */
+function answer(isCorrect) {
   if (answered) return;
   answered = true;
 
   stats.u--;
+  isCorrect ? stats.c++ : stats.i++;
 
-  const correct = questions[index].correct;
-
-  document.querySelectorAll(".option-btn").forEach(b => {
-    const opt = b.dataset.key;
-
-    if (opt === correct) {
-      b.classList.add("correct");
-      b.querySelector(".icon").innerHTML = "✔";
-    }
-
-    if (b === btn && opt !== correct) {
-      b.classList.add("wrong");
-      b.querySelector(".icon").innerHTML = "✖";
-    }
-
-    b.disabled = true;
-  });
-
-  btn.dataset.key === correct ? stats.c++ : stats.i++;
   updateStats();
-
-  setTimeout(next, 5000);
+  next();
 }
 
-/**************** SKIP ****************/
+/* ================= SKIP ================= */
 document.getElementById("skipBtn").onclick = () => {
   if (answered) return;
   answered = true;
@@ -174,38 +73,21 @@ document.getElementById("skipBtn").onclick = () => {
   next();
 };
 
+/* ================= NEXT ================= */
 function next() {
   index++;
   showQuestion();
+  checkCompletion();
 }
 
-/**************** STATS UI ****************/
+/* ================= STATS ================= */
 function updateStats() {
-  const total = stats.c + stats.i + stats.s + stats.u || 1;
-
   ["c", "i", "s", "u"].forEach(k => {
     document.getElementById(`count-${k}`).innerText = stats[k];
-    document.getElementById(`bar-${k}`).style.width =
-      (stats[k] / total) * 100 + "%";
   });
 }
 
-/**************** HELPERS ****************/
-window.toggleSection = function(id) {
-  const el = document.getElementById(id);
-  el.style.display = el.style.display === "block" ? "none" : "block";
-};
-
-window.filterList = function(input, id) {
-  const v = input.value.toLowerCase();
-  document.querySelectorAll(`#${id} label`)
-    .forEach(l => {
-      l.style.display =
-        l.textContent.toLowerCase().includes(v) ? "" : "none";
-    });
-};
-
-
+/* ================= COMPLETION ================= */
 function checkCompletion() {
   if (stats.u === 0) {
     showResult();
@@ -213,39 +95,15 @@ function checkCompletion() {
   }
 }
 
-/**************** RESULT UI ****************/
+/* ================= RESULT ================= */
 function showResult() {
-  const total = stats.c + stats.i + stats.s + stats.u;
-
-  const deg = x => (x / total) * 360;
-
-  const cDeg = deg(stats.c);
-  const iDeg = cDeg + deg(stats.i);
-  const sDeg = iDeg + deg(stats.s);
-
-  document.getElementById("donutChart").style.background =
-    `conic-gradient(
-      #fff 0deg ${cDeg}deg,
-      #777 ${cDeg}deg ${iDeg}deg,
-      #444 ${iDeg}deg ${sDeg}deg,
-      #222 ${sDeg}deg 360deg
-    )`;
-
-  document.getElementById("r-c").innerText = stats.c;
-  document.getElementById("r-i").innerText = stats.i;
-  document.getElementById("r-s").innerText = stats.s;
-  document.getElementById("r-u").innerText = stats.u;
-
   document.getElementById("resultOverlay").style.display = "flex";
 }
 
-/**************** RESET ****************/
+/* ================= RESET ================= */
 function resetQuiz() {
   document.getElementById("resultOverlay").style.display = "none";
 
-  document.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = false);
-
-  questions = [...allQuestions];
   index = 0;
   answered = false;
   stats = { c: 0, i: 0, s: 0, u: questions.length };
@@ -254,19 +112,4 @@ function resetQuiz() {
   showQuestion();
 }
 
-/* ---------- CALL CHECK AFTER EVERY CHANGE ---------- */
-/* ADD THESE TWO LINES */
-
-const _next = next;
-next = function() {
-  _next();
-  checkCompletion();
-};
-
-const _skip = document.getElementById("skipBtn").onclick;
-document.getElementById("skipBtn").onclick = function() {
-  _skip();
-  checkCompletion();
-};
-
-});  
+});
