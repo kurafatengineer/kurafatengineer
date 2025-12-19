@@ -4,28 +4,33 @@
   <meta charset="UTF-8" />
   <title>Quiz Page</title>
 
-  <!-- ================= COMMON CSS ================= -->
   <link rel="stylesheet" href="css/common.css" />
-
-  <!-- ================= QUIZ CSS ================= -->
   <link rel="stylesheet" href="css/quiz.css" />
 
-  <!-- ================= FONT AWESOME (REQUIRED) ================= -->
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 
 <body>
 
-<!-- ================= HEADER (AUTO LOAD) ================= -->
 <div id="header"></div>
 
-<!-- ================= QUIZ PAGE ================= -->
+<!-- TOGGLES -->
+<button id="filterToggle" class="side-toggle left">
+  <i class="fas fa-filter"></i>
+</button>
+
+<button id="progressToggle" class="side-toggle right">
+  <i class="fas fa-chart-bar"></i>
+</button>
+
 <main class="quiz-page">
 
-  <!-- ================= FILTER PANEL ================= -->
-  <aside class="filter-panel">
-    <h3>Filter Questions</h3>
+  <!-- FILTER -->
+  <aside class="filter-panel" id="filterPanel">
+    <h3>Filter</h3>
+
+    <input class="filter-search" placeholder="Search" />
 
     <div class="filter-group">
       <h4>Year</h4>
@@ -38,11 +43,6 @@
     </div>
 
     <div class="filter-group">
-      <h4>Topic</h4>
-      <div class="filter-list" id="filter-topic"></div>
-    </div>
-
-    <div class="filter-group">
       <h4>Paper</h4>
       <div class="filter-list" id="filter-paper"></div>
     </div>
@@ -51,106 +51,48 @@
       <h4>Subject</h4>
       <div class="filter-list" id="filter-subject"></div>
     </div>
+
+    <div class="filter-group">
+      <h4>Topic</h4>
+      <div class="filter-list" id="filter-topic"></div>
+    </div>
   </aside>
 
-  <!-- ================= QUIZ SECTION ================= -->
+  <!-- QUIZ -->
   <section class="quiz-section">
 
-    <!-- Exam Details -->
     <div class="exam-details">
-      <span id="exam-name">Exam Name</span>
-      <span id="exam-year">Year</span>
-      <span id="exam-paper">Paper</span>
+      <span id="exam-meta"></span>
+      <span id="exam-paper"></span>
     </div>
 
-    <!-- Question -->
     <div class="question-card">
-      <div class="question-text" id="question">
-        Question text will appear here
-      </div>
+      <div class="question-text" id="question"></div>
     </div>
 
-    <!-- Options -->
     <div class="options" id="options"></div>
 
-    <!-- Skip -->
-    <button class="skip-btn" id="skipBtn">
-      Skip Question
-    </button>
-
+    <button class="skip-btn" id="skipBtn">Skip Question</button>
   </section>
 
-  <!-- ================= PROGRESS REPORT ================= -->
-  <aside class="progress-panel">
-    <h3>Progress Report</h3>
+  <!-- PROGRESS -->
+  <aside class="progress-panel" id="progressPanel">
+    <h3>Progress</h3>
 
-    <div class="progress-item">
-      <span>C</span>
-      <div class="bar"><div id="bar-c"></div></div>
-      <span id="count-c">0</span>
-    </div>
-
-    <div class="progress-item">
-      <span>I</span>
-      <div class="bar"><div id="bar-i"></div></div>
-      <span id="count-i">0</span>
-    </div>
-
-    <div class="progress-item">
-      <span>S</span>
-      <div class="bar"><div id="bar-s"></div></div>
-      <span id="count-s">0</span>
-    </div>
-
-    <div class="progress-item">
-      <span>U</span>
-      <div class="bar"><div id="bar-u"></div></div>
-      <span id="count-u">0</span>
-    </div>
+    <div class="progress-item"><span>C</span><div class="bar"><div id="bar-c"></div></div><span id="count-c">0</span></div>
+    <div class="progress-item"><span>I</span><div class="bar"><div id="bar-i"></div></div><span id="count-i">0</span></div>
+    <div class="progress-item"><span>S</span><div class="bar"><div id="bar-s"></div></div><span id="count-s">0</span></div>
+    <div class="progress-item"><span>U</span><div class="bar"><div id="bar-u"></div></div><span id="count-u">0</span></div>
   </aside>
 
 </main>
 
-<!-- ================= RESULT CARD ================= -->
-<div class="result-overlay" id="resultOverlay">
-  <div class="result-card">
-
-    <h2>Quiz Result</h2>
-
-    <!-- Donut Chart -->
-    <div class="donut-chart" id="donutChart"></div>
-
-    <!-- Result Details -->
-    <ul class="result-stats">
-      <li>✔ Correct (C): <span id="r-c">0</span></li>
-      <li>✖ Incorrect (I): <span id="r-i">0</span></li>
-      <li>➟ Skipped (S): <span id="r-s">0</span></li>
-      <li>○ Unattempted (U): <span id="r-u">0</span></li>
-    </ul>
-
-    <p class="reset-info">
-      Quiz will reset automatically in 10 seconds
-    </p>
-
-  </div>
-</div>
-
-<!-- ================= FOOTER (AUTO LOAD) ================= -->
 <div id="footer"></div>
 
-<!-- ================= SCRIPTS ================= -->
 <script src="js/quiz.js"></script>
-
 <script>
-  // Load common header
-  fetch("partials/header.html")
-    .then(res => res.text())
-    .then(html => document.getElementById("header").innerHTML = html);
-
-  // Load common footer
-  fetch("partials/footer.html")
-    .then(res => res.text())
-    .then(html => document.getElementById("footer").innerHTML = html);
+  fetch("partials/header.html").then(r=>r.text()).then(d=>header.innerHTML=d);
+  fetch("partials/footer.html").then(r=>r.text()).then(d=>footer.innerHTML=d);
 </script>
 
 </body>
