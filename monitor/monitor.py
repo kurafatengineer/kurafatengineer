@@ -1,4 +1,3 @@
-
 import requests
 from bs4 import BeautifulSoup
 import hashlib
@@ -47,6 +46,9 @@ def get_notifications_from_url(url):
     return new_notifications
 
 def main():
+    # टेस्ट के लिए एक बार टेलीग्राम मैसेज भेजें
+    send_telegram_message("यह एक टेस्ट मैसेज है! अगर यह आ गया तो सब कुछ सही से काम कर रहा है।")
+    
     for url in URLS:
         print(f"Checking: {url}")
         new_notifs = get_notifications_from_url(url)
