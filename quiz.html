@@ -1,99 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Quiz Page</title>
-
-  <link rel="stylesheet" href="css/common.css" />
-  <link rel="stylesheet" href="css/quiz.css" />
-
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<meta charset="UTF-8">
+<title>Quiz</title>
+<link rel="stylesheet" href="quiz.css">
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
 
-<div id="header"></div>
-
 <!-- TOGGLES -->
-<button id="filterToggle" class="side-toggle left">
-  <i class="fas fa-filter"></i>
+<button id="toggleFilter" class="side-toggle left">
+  <i class="fa-solid fa-filter"></i>
 </button>
 
-<button id="progressToggle" class="side-toggle right">
-  <i class="fas fa-chart-bar"></i>
+<button id="toggleProgress" class="side-toggle right">
+  <i class="fa-solid fa-chart-pie"></i>
 </button>
 
 <main class="quiz-page">
 
-  <!-- FILTER -->
-  <aside class="filter-panel" id="filterPanel">
-    <h3>Filter</h3>
+<!-- FILTER -->
+<aside class="filter-panel" id="filterPanel">
+  <h3>Filters</h3>
 
-    <input class="filter-search" placeholder="Search" />
+  <div class="filter-group">
+    <h4>Exam</h4>
+    <div class="filter-list" id="filter-exam"></div>
+  </div>
 
-    <div class="filter-group">
-      <h4>Year</h4>
-      <div class="filter-list" id="filter-year"></div>
-    </div>
+  <div class="filter-group">
+    <h4>Year</h4>
+    <div class="filter-list" id="filter-year"></div>
+  </div>
 
-    <div class="filter-group">
-      <h4>Exam</h4>
-      <div class="filter-list" id="filter-exam"></div>
-    </div>
+  <div class="filter-group">
+    <h4>Paper</h4>
+    <div class="filter-list" id="filter-paper"></div>
+  </div>
 
-    <div class="filter-group">
-      <h4>Paper</h4>
-      <div class="filter-list" id="filter-paper"></div>
-    </div>
+  <div class="filter-group">
+    <h4>Subject</h4>
+    <div class="filter-list" id="filter-subject"></div>
+  </div>
 
-    <div class="filter-group">
-      <h4>Subject</h4>
-      <div class="filter-list" id="filter-subject"></div>
-    </div>
+  <div class="filter-group">
+    <h4>Topic</h4>
+    <div class="filter-list" id="filter-topic"></div>
+  </div>
+</aside>
 
-    <div class="filter-group">
-      <h4>Topic</h4>
-      <div class="filter-list" id="filter-topic"></div>
-    </div>
-  </aside>
+<!-- QUIZ -->
+<section class="quiz-section">
 
-  <!-- QUIZ -->
-  <section class="quiz-section">
+  <div class="exam-details">
+    <span id="examCombined"></span>
+    <span id="examPaper"></span>
+  </div>
 
-    <div class="exam-details">
-      <span id="exam-meta"></span>
-      <span id="exam-paper"></span>
-    </div>
+  <div class="question-card">
+    <div id="question"></div>
+  </div>
 
-    <div class="question-card">
-      <div class="question-text" id="question"></div>
-    </div>
+  <div class="options" id="options"></div>
 
-    <div class="options" id="options"></div>
+  <button class="skip-btn" id="skipBtn">Skip</button>
+</section>
 
-    <button class="skip-btn" id="skipBtn">Skip Question</button>
-  </section>
+<!-- PROGRESS -->
+<aside class="progress-panel" id="progressPanel">
+  <h3>Progress</h3>
 
-  <!-- PROGRESS -->
-  <aside class="progress-panel" id="progressPanel">
-    <h3>Progress</h3>
-
-    <div class="progress-item"><span>C</span><div class="bar"><div id="bar-c"></div></div><span id="count-c">0</span></div>
-    <div class="progress-item"><span>I</span><div class="bar"><div id="bar-i"></div></div><span id="count-i">0</span></div>
-    <div class="progress-item"><span>S</span><div class="bar"><div id="bar-s"></div></div><span id="count-s">0</span></div>
-    <div class="progress-item"><span>U</span><div class="bar"><div id="bar-u"></div></div><span id="count-u">0</span></div>
-  </aside>
+  <div class="progress-item"><span>C</span><div class="bar"><div id="bar-c"></div></div><span id="count-c">0</span></div>
+  <div class="progress-item"><span>I</span><div class="bar"><div id="bar-i"></div></div><span id="count-i">0</span></div>
+  <div class="progress-item"><span>S</span><div class="bar"><div id="bar-s"></div></div><span id="count-s">0</span></div>
+  <div class="progress-item"><span>U</span><div class="bar"><div id="bar-u"></div></div><span id="count-u">0</span></div>
+</aside>
 
 </main>
 
-<div id="footer"></div>
-
-<script src="js/quiz.js"></script>
-<script>
-  fetch("partials/header.html").then(r=>r.text()).then(d=>header.innerHTML=d);
-  fetch("partials/footer.html").then(r=>r.text()).then(d=>footer.innerHTML=d);
-</script>
-
+<script src="quiz.js"></script>
 </body>
 </html>
