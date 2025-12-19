@@ -4,11 +4,15 @@
   <meta charset="UTF-8" />
   <title>Quiz Page</title>
 
-  <!-- Common CSS -->
+  <!-- ================= COMMON CSS ================= -->
   <link rel="stylesheet" href="css/common.css" />
 
-  <!-- Quiz specific CSS -->
+  <!-- ================= QUIZ CSS ================= -->
   <link rel="stylesheet" href="css/quiz.css" />
+
+  <!-- ================= FONT AWESOME (REQUIRED) ================= -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 
 <body>
@@ -52,20 +56,24 @@
   <!-- ================= QUIZ SECTION ================= -->
   <section class="quiz-section">
 
+    <!-- Exam Details -->
     <div class="exam-details">
       <span id="exam-name">Exam Name</span>
       <span id="exam-year">Year</span>
       <span id="exam-paper">Paper</span>
     </div>
 
+    <!-- Question -->
     <div class="question-card">
       <div class="question-text" id="question">
         Question text will appear here
       </div>
     </div>
 
+    <!-- Options -->
     <div class="options" id="options"></div>
 
+    <!-- Skip -->
     <button class="skip-btn" id="skipBtn">
       Skip Question
     </button>
@@ -109,8 +117,10 @@
 
     <h2>Quiz Result</h2>
 
+    <!-- Donut Chart -->
     <div class="donut-chart" id="donutChart"></div>
 
+    <!-- Result Details -->
     <ul class="result-stats">
       <li>✔ Correct (C): <span id="r-c">0</span></li>
       <li>✖ Incorrect (I): <span id="r-i">0</span></li>
@@ -132,10 +142,12 @@
 <script src="js/quiz.js"></script>
 
 <script>
+  // Load common header
   fetch("partials/header.html")
     .then(res => res.text())
     .then(html => document.getElementById("header").innerHTML = html);
 
+  // Load common footer
   fetch("partials/footer.html")
     .then(res => res.text())
     .then(html => document.getElementById("footer").innerHTML = html);
