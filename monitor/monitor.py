@@ -23,7 +23,7 @@ def send_telegram_message(message):
     requests.post(telegram_url, data=payload)
 
 def get_notifications_from_url(url):
-    response = requests.get(url, timeout=15)
+    response = requests.get(url, timeout=30)  # टाइमआउट बढ़ा दिया है
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
     
@@ -34,7 +34,7 @@ def get_notifications_from_url(url):
     for notice in notifications:
         title = notice.get_text(strip=True)
         link = notice.get("href")
-        # सुनिश्चित करें कि लिंक पूरा है (अक्सर बेस URL जोड़ना पड़ता है)
+        # सुनिश्चित करें कि लिंक पूरा है
         if link and not link.startswith("http"):
             link = url.rstrip("/") + "/" + link
         
@@ -46,9 +46,9 @@ def get_notifications_from_url(url):
     return new_notifications
 
 def main():
-    # टेस्ट के लिए एक बार टेलीग्राम मैसेज भेजें
-    send_telegram_message("यह एक टेस्ट मैसेज है! अगर यह आ गया तो सब कुछ सही से काम कर रहा है।")
-    
+    # एग्जीक्यूशन शुरू होने पर टेलीग्राम मैसेज भेजें
+    send_telegram_message("Execution started!")
+
     for url in URLS:
         print(f"Checking: {url}")
         new_notifs = get_notifications_from_url(url)
@@ -60,5 +60,5 @@ def main():
                 send_telegram_message(message)
                 LAST_HASHES[url] = content_hash
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
