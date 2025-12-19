@@ -2,63 +2,104 @@ import requests
 from bs4 import BeautifulSoup
 import hashlib
 import os
+import logging
 
-# मल्टीपल वेबसाइट URLs
+# ---------------- LOGGING ----------------
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
+# ---------------- CONFIG ----------------
 URLS = [
     "https://ssc.gov.in/home/notice-board",
-    "https://example2.gov.in/notifications",
-    # यहाँ आप अपनी और भी वेबसाइट जोड़ सकते हैं
+    # add more sites later
 ]
 
-# Telegram के लिए बोट टोकन और चैट आईडी
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-# हर वेबसाइट के लिए पिछले नोटिफिकेशन का हैश स्टोर करने के लिए एक डिक्शनरी
-LAST_HASHES = {}
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/120.0.0.0 Safari/537.36"
+    )
+}
 
-def send_telegram_message(message):
-    telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": CHAT_ID, "text": message}
-    requests.post(telegram_url, data=payload)
+TIMEOUT_SECONDS = 30
+
+# ----------------------------------------
+
+def send_telegram_message(text):
+    try:
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+        requests.post(
+            url,
+            data={"chat_id": CHAT_ID, "text": text},
+            timeout=10
+        )
+    except Exception as e:
+        logging.error(f"Telegram send failed: {e}")
 
 def get_notifications_from_url(url):
-    response = requests.get(url, timeout=100)  # टाइमआउट बढ़ा दिया है
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, "html.parser")
-    
-    # यहाँ आप वही CSS सेलेक्टर लगाएँ जो नोटिफिकेशन आपको निकालना है
-    notifications = soup.find_all("a", class_="notice-link")
-    
-    new_notifications = []
-    for notice in notifications:
-        title = notice.get_text(strip=True)
-        link = notice.get("href")
-        # सुनिश्चित करें कि लिंक पूरा है
-        if link and not link.startswith("http"):
-            link = url.rstrip("/") + "/" + link
-        
-        # नोटिफिकेशन के टेक्स्ट का हैश बनाएँ
-        content_hash = hashlib.md5(title.encode()).hexdigest()
-        
-        new_notifications.append((content_hash, title, link))
-    
-    return new_notifications
+    try:
+        response = requests.get(
+            url,
+            headers=HEADERS,
+            timeout=TIMEOUT_SECONDS
+        )
+        response.raise_for_status()
+
+        soup = BeautifulSoup(response.text, "html.parser")
+        links = soup.find_all("a")
+
+        results = []
+        for a in links:
+            title = a.get_text(strip=True)
+            link = a.get("href")
+
+            if not title or not link:
+                continue
+
+            if not link.startswith("http"):
+                link = url.rstrip("/") + "/" + link
+
+            uid = hashlib.md5((title + link).encode()).hexdigest()
+            results.append((uid, title, link))
+
+        return results
+
+    except requests.exceptions.ConnectTimeout:
+        logging.error(f"TIMEOUT → {url}")
+        send_telegram_message(
+            f"⚠️ TIMEOUT while accessing:\n{url}\n"
+            "Likely blocked or server not responding."
+        )
+        return []
+
+    except requests.exceptions.HTTPError as e:
+        logging.error(f"HTTP ERROR → {url} → {e}")
+        return []
+
+    except Exception as e:
+        logging.error(f"UNKNOWN ERROR → {url} → {e}")
+        return []
 
 def main():
-    # एग्जीक्यूशन शुरू होने पर टेलीग्राम मैसेज भेजें
-    send_telegram_message("Execution started!")
+    # ---- execution start message ----
+    send_telegram_message("🚀 Monitor execution started")
 
     for url in URLS:
-        print(f"Checking: {url}")
-        new_notifs = get_notifications_from_url(url)
-        
-        for content_hash, title, link in new_notifs:
-            last_hash = LAST_HASHES.get(url)
-            if last_hash != content_hash:
-                message = f"🚨 New notification on {url}:\n{title}\n🔗 {link}"
-                send_telegram_message(message)
-                LAST_HASHES[url] = content_hash
+        logging.info(f"Checking: {url}")
+        notices = get_notifications_from_url(url)
 
-if __name__ == '__main__':
+        if not notices:
+            logging.info("No data fetched (blocked / timeout)")
+            continue
+
+        send_telegram_message(
+            f"✅ Data fetched successfully\n"
+            f"Website: {url}\n"
+            f"Items found: {len(notices)}"
+        )
+
+if __name__ == "__main__":
     main()
