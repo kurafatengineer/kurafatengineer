@@ -2,137 +2,146 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>PYQs Quiz</title>
+  <title>Quiz Page</title>
 
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Common CSS (Header + Footer) -->
+  <link rel="stylesheet" href="css/common.css" />
 
+  <!-- Quiz specific CSS -->
   <link rel="stylesheet" href="css/quiz.css" />
 </head>
 
 <body>
 
-<!-- ================= HEADER ================= -->
-<header class="main-header">
-  <h1>Rahul Kumar</h1>
-  <div class="header-line"></div>
+<!-- ================= COMMON HEADER ================= -->
+<header class="site-header">
+  <!-- same header as index.html -->
 </header>
 
-<button id="filterToggle"><i class="fas fa-sliders-h"></i></button>
-<button id="statsToggle"><i class="fas fa-chart-bar"></i></button>
+<!-- ================= QUIZ PAGE ================= -->
+<main class="quiz-page">
 
-<div id="app">
+  <!-- ================= FILTER PANEL ================= -->
+  <aside class="filter-panel">
+    <h3>Filter Questions</h3>
 
-  <!-- ================= FILTER SIDEBAR ================= -->
-  <aside id="filter-sidebar">
-    <div class="filter-section">
-      <h4 onclick="toggleSection('yearBox')">Year</h4>
-      <div id="yearBox" class="filter-content">
-        <input type="text" placeholder="Search" onkeyup="filterList(this,'yearList')" />
-        <div id="yearList" class="filter-list"></div>
-      </div>
+    <div class="filter-group">
+      <h4>Year</h4>
+      <div class="filter-list" id="filter-year"></div>
     </div>
 
-    <div class="filter-section">
-      <h4 onclick="toggleSection('topicBox')">Topic</h4>
-      <div id="topicBox" class="filter-content">
-        <input type="text" placeholder="Search" onkeyup="filterList(this,'topicList')" />
-        <div id="topicList" class="filter-list"></div>
-      </div>
+    <div class="filter-group">
+      <h4>Exam</h4>
+      <div class="filter-list" id="filter-exam"></div>
     </div>
 
-    <div class="filter-section">
-      <h4 onclick="toggleSection('examBox')">Exam</h4>
-      <div id="examBox" class="filter-content">
-        <input type="text" placeholder="Search" onkeyup="filterList(this,'examList')" />
-        <div id="examList" class="filter-list"></div>
-      </div>
+    <div class="filter-group">
+      <h4>Topic</h4>
+      <div class="filter-list" id="filter-topic"></div>
     </div>
 
-    <div class="filter-section">
-      <h4 onclick="toggleSection('paperBox')">Paper</h4>
-      <div id="paperBox" class="filter-content">
-        <input type="text" placeholder="Search" onkeyup="filterList(this,'paperList')" />
-        <div id="paperList" class="filter-list"></div>
-      </div>
+    <div class="filter-group">
+      <h4>Paper</h4>
+      <div class="filter-list" id="filter-paper"></div>
     </div>
 
-    <div class="filter-section">
-      <h4 onclick="toggleSection('subjectBox')">Subject</h4>
-      <div id="subjectBox" class="filter-content">
-        <input type="text" placeholder="Search" onkeyup="filterList(this,'subjectList')" />
-        <div id="subjectList" class="filter-list"></div>
-      </div>
+    <div class="filter-group">
+      <h4>Subject</h4>
+      <div class="filter-list" id="filter-subject"></div>
     </div>
   </aside>
 
-  <!-- ================= QUIZ ================= -->
-  <main id="quiz-container">
-    <div id="question-card">
-      <div id="question"></div>
+  <!-- ================= QUIZ SECTION ================= -->
+  <section class="quiz-section">
+
+    <!-- Exam Details -->
+    <div class="exam-details">
+      <span id="exam-name">Exam Name</span>
+      <span id="exam-year">Year</span>
+      <span id="exam-paper">Paper</span>
     </div>
 
-    <div id="options"></div>
-
-    <button id="skipBtn">Skip</button>
-
-    <div class="legend">
-      C: Correct | I: Incorrect | S: Skipped | U: Unattempted
+    <!-- Question -->
+    <div class="question-card">
+      <div class="question-text" id="question">
+        Question text will appear here
+      </div>
     </div>
-  </main>
 
-  <!-- ================= STATS ================= -->
-  <aside id="stats-panel">
+    <!-- Options -->
+    <div class="options" id="options">
+      <!-- option buttons injected via JS -->
+    </div>
+
+    <!-- Skip -->
+    <button class="skip-btn" id="skipBtn">
+      Skip Question
+    </button>
+
+  </section>
+
+  <!-- ================= PROGRESS REPORT ================= -->
+  <aside class="progress-panel">
     <h3>Progress Report</h3>
 
-    <div class="stat">
+    <div class="progress-item">
       <span>C</span>
       <div class="bar"><div id="bar-c"></div></div>
       <span id="count-c">0</span>
     </div>
 
-    <div class="stat">
+    <div class="progress-item">
       <span>I</span>
       <div class="bar"><div id="bar-i"></div></div>
       <span id="count-i">0</span>
     </div>
 
-    <div class="stat">
+    <div class="progress-item">
       <span>S</span>
       <div class="bar"><div id="bar-s"></div></div>
       <span id="count-s">0</span>
     </div>
 
-    <div class="stat">
+    <div class="progress-item">
       <span>U</span>
       <div class="bar"><div id="bar-u"></div></div>
       <span id="count-u">0</span>
     </div>
   </aside>
-</div>
 
-<!-- ================= RESULT OVERLAY ================= -->
-<div id="resultOverlay">
+</main>
+
+<!-- ================= RESULT CARD ================= -->
+<div class="result-overlay" id="resultOverlay">
   <div class="result-card">
-    <h2>Quiz Summary</h2>
 
-    <div id="donutChart"></div>
+    <h2>Quiz Result</h2>
 
-    <ul>
-      <li>✔ Correct: <span id="r-c"></span></li>
-      <li>✖ Incorrect: <span id="r-i"></span></li>
-      <li>➟ Skipped: <span id="r-s"></span></li>
-      <li>○ Unattempted: <span id="r-u"></span></li>
+    <!-- Donut Chart -->
+    <div class="donut-chart" id="donutChart"></div>
+
+    <!-- Result Details -->
+    <ul class="result-stats">
+      <li>✔ Correct (C): <span id="r-c">0</span></li>
+      <li>✖ Incorrect (I): <span id="r-i">0</span></li>
+      <li>➟ Skipped (S): <span id="r-s">0</span></li>
+      <li>○ Unattempted (U): <span id="r-u">0</span></li>
     </ul>
 
-    <p class="reset-msg">Resetting quiz in 10 seconds...</p>
+    <p class="reset-info">
+      Quiz will reset automatically in 10 seconds
+    </p>
+
   </div>
 </div>
 
-<footer class="footer">
-  <div class="footer-line"></div>
+<!-- ================= COMMON FOOTER ================= -->
+<footer class="site-footer">
+  <!-- same footer as index.html -->
 </footer>
 
+<!-- Quiz JS -->
 <script src="js/quiz.js"></script>
+
 </body>
 </html>
