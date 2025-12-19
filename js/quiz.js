@@ -1,194 +1,74 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  /* ================= CONFIG ================= */
-  const SHEET_ID = "1--MzYQ98U_dSVmdDwY-aGAxba2XgiLXJlttJvLPtQvU";
-  const SHEET_NAME = "PYQs";
-  const SHEET_URL =
-    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+const SHEET_ID = "1--MzYQ98U_dSVmdDwY-aGAxba2XgiLXJlttJvLPtQvU";
+const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=PYQs`;
 
-  /* ================= STATE ================= */
-  let allQuestions = [];
-  let questions = [];
-  let index = 0;
-  let answered = false;
+let all=[], list=[], i=0, stats={c:0,i:0,s:0,u:0};
 
-  let stats = { c: 0, i: 0, s: 0, u: 0 };
-
-  /* ================= FETCH DATA ================= */
-  fetch(SHEET_URL)
-    .then(res => res.text())
-    .then(text => {
-      const json = JSON.parse(text.substring(47).slice(0, -2));
-
-      json.table.rows.forEach(row => {
-        if (!row.c[4] || !row.c[11]) return;
-
-        allQuestions.push({
-          exam: row.c[0]?.v || "",
-          year: row.c[1]?.v || "",
-          paper: row.c[2]?.v || "",
-          question: row.c[4].v,
-          correct: row.c[11].v.toLowerCase(),
-          subject: row.c[12]?.v || "",
-          topic: row.c[13]?.v || ""
-        });
-      });
-
-      questions = [...allQuestions];
-      stats.u = questions.length;
-
-      populateFilters();
-      updateStats();
-      showQuestion();
+fetch(URL).then(r=>r.text()).then(t=>{
+  const j=JSON.parse(t.substr(47).slice(0,-2));
+  j.table.rows.forEach(r=>{
+    if(!r.c[4])return;
+    all.push({
+      exam:r.c[0]?.v||"",
+      year:r.c[1]?.v||"",
+      paper:r.c[2]?.v||"",
+      q:r.c[4].v,
+      a:r.c[11]?.v.toLowerCase(),
+      subject:r.c[12]?.v||"",
+      topic:r.c[13]?.v||""
     });
-
-  /* ================= FILTERS ================= */
-  function populateFilters() {
-    fillFilter("filter-exam", "exam");
-    fillFilter("filter-year", "year");
-    fillFilter("filter-paper", "paper");
-    fillFilter("filter-subject", "subject");
-    fillFilter("filter-topic", "topic");
-  }
-
-  function fillFilter(id, key) {
-    const el = document.getElementById(id);
-    el.innerHTML = "";
-
-    [...new Set(allQuestions.map(q => q[key]).filter(Boolean))]
-      .sort()
-      .forEach(val => {
-        el.innerHTML += `
-          <label>
-            <input type="checkbox" value="${val}">
-            ${val}
-          </label>
-        `;
-      });
-  }
-
-  document.addEventListener("change", e => {
-    if (e.target.type !== "checkbox") return;
-
-    const get = id =>
-      [...document.querySelectorAll(`#${id} input:checked`)]
-        .map(i => i.value);
-
-    questions = allQuestions.filter(q =>
-      (!get("filter-exam").length || get("filter-exam").includes(q.exam)) &&
-      (!get("filter-year").length || get("filter-year").includes(q.year)) &&
-      (!get("filter-paper").length || get("filter-paper").includes(q.paper)) &&
-      (!get("filter-subject").length || get("filter-subject").includes(q.subject)) &&
-      (!get("filter-topic").length || get("filter-topic").includes(q.topic))
-    );
-
-    index = 0;
-    stats = { c: 0, i: 0, s: 0, u: questions.length };
-    updateStats();
-    showQuestion();
   });
+  list=[...all]; stats.u=list.length;
+  renderFilters(); show();
+});
 
-  /* ================= SHOW QUESTION ================= */
-  function showQuestion() {
-    answered = false;
-
-    if (index >= questions.length) {
-      showResult();
-      return;
-    }
-
-    const q = questions[index];
-
-    document.getElementById("exam-name").innerText = q.exam;
-    document.getElementById("exam-year").innerText = q.year;
-    document.getElementById("exam-paper").innerText = q.paper;
-
-    const questionText = q.question.replace(/\([a-e]\)[\s\S]*/i, "").trim();
-    document.getElementById("question").innerText = questionText;
-
-    const optionsDiv = document.getElementById("options");
-    optionsDiv.innerHTML = "";
-
-    const regex = /\(([a-e])\)\s*([^()]+)/gi;
-    [...q.question.matchAll(regex)].forEach(m => {
-      const btn = document.createElement("button");
-      btn.className = "option-btn";
-      btn.dataset.key = m[1].toLowerCase();
-      btn.innerText = `${m[1].toUpperCase()}. ${m[2]}`;
-      btn.onclick = () => answer(btn);
-      optionsDiv.appendChild(btn);
+function renderFilters(){
+  ["exam","year","paper","subject","topic"].forEach(k=>{
+    const el=document.getElementById("filter-"+k);
+    [...new Set(all.map(q=>q[k]))].forEach(v=>{
+      el.innerHTML+=`<label><input type=checkbox value="${v}">${v}</label>`;
     });
-  }
+  });
+}
 
-  /* ================= ANSWER ================= */
-  function answer(btn) {
-    if (answered) return;
-    answered = true;
+document.addEventListener("change",e=>{
+  if(e.target.type!=="checkbox")return;
+  list=all.filter(q=>
+    ["exam","year","paper","subject","topic"].every(k=>{
+      const c=[...document.querySelectorAll(`#filter-${k} input:checked`)].map(i=>i.value);
+      return !c.length||c.includes(q[k]);
+    })
+  );
+  i=0; stats={c:0,i:0,s:0,u:list.length}; show();
+});
 
-    stats.u--;
-    const correct = questions[index].correct;
+function show(){
+  if(i>=list.length)return;
+  const q=list[i];
+  examMeta.innerText=`${q.exam} ${q.year}`;
+  examPaper.innerText=q.paper;
+  question.innerText=q.q.replace(/\([a-e]\).*/i,"");
+  options.innerHTML="";
+  [...q.q.matchAll(/\(([a-e])\)\s*([^()]+)/gi)].forEach(m=>{
+    const b=document.createElement("button");
+    b.className="option-btn";
+    b.innerHTML=`<span class="opt-key">${m[1]}</span>${m[2]}`;
+    b.onclick=()=>answer(b,m[1]);
+    options.appendChild(b);
+  });
+}
 
-    document.querySelectorAll(".option-btn").forEach(b => {
-      b.disabled = true;
-      if (b.dataset.key === correct) b.classList.add("correct");
-      if (b === btn && b.dataset.key !== correct) b.classList.add("wrong");
-    });
+function answer(btn,k){
+  const c=list[i].a;
+  document.querySelectorAll(".option-btn").forEach(b=>{
+    if(b.querySelector(".opt-key").innerText.toLowerCase()===c)b.classList.add("correct");
+  });
+  if(k!==c)btn.classList.add("wrong");
+  i++; setTimeout(show,1000);
+}
 
-    btn.dataset.key === correct ? stats.c++ : stats.i++;
-    updateStats();
-
-    setTimeout(next, 1200);
-  }
-
-  /* ================= SKIP ================= */
-  document.getElementById("skipBtn").onclick = () => {
-    if (answered) return;
-    answered = true;
-    stats.u--;
-    stats.s++;
-    updateStats();
-    next();
-  };
-
-  function next() {
-    index++;
-    showQuestion();
-  }
-
-  /* ================= STATS ================= */
-  function updateStats() {
-    const total = stats.c + stats.i + stats.s + stats.u || 1;
-
-    ["c", "i", "s", "u"].forEach(k => {
-      document.getElementById(`count-${k}`).innerText = stats[k];
-      document.getElementById(`bar-${k}`).style.width =
-        (stats[k] / total) * 100 + "%";
-    });
-  }
-
-  /* ================= RESULT ================= */
-  function showResult() {
-    const total = stats.c + stats.i + stats.s + stats.u;
-
-    const deg = v => (v / total) * 360;
-    const c = deg(stats.c);
-    const i = c + deg(stats.i);
-    const s = i + deg(stats.s);
-
-    document.getElementById("donutChart").style.background =
-      `conic-gradient(
-        #fff 0deg ${c}deg,
-        #777 ${c}deg ${i}deg,
-        #444 ${i}deg ${s}deg,
-        #222 ${s}deg 360deg
-      )`;
-
-    document.getElementById("r-c").innerText = stats.c;
-    document.getElementById("r-i").innerText = stats.i;
-    document.getElementById("r-s").innerText = stats.s;
-    document.getElementById("r-u").innerText = stats.u;
-
-    document.getElementById("resultOverlay").style.display = "flex";
-  }
+filterToggle.onclick=()=>filterPanel.classList.toggle("open");
+progressToggle.onclick=()=>progressPanel.classList.toggle("open");
 
 });
