@@ -1,1 +1,107 @@
+/* ================= QUIZ SECTION ================= */
+.quiz-section {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;                 /* center horizontally */
+  border: 1px solid #fff;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
+/* Center vertically in viewport */
+.quiz-page {
+  min-height: calc(100vh - 120px); /* header/footer space */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ================= EXAM DETAILS ================= */
+.exam-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+
+/* ================= QUESTION CARD ================= */
+.question-card {
+  border: 1px solid #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.question-text {
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ================= OPTIONS ================= */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+/* Option buttons (used by JS) */
+.option-btn {
+  width: 100%;
+  padding: 12px 14px;
+  background: #000;
+  border: 1px solid #fff;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.4;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.option-btn:hover {
+  background: #fff;
+  color: #000;
+}
+
+.option-btn.correct {
+  background: #fff;
+  color: #000;
+}
+
+.option-btn.wrong {
+  opacity: 0.6;
+}
+
+/* ================= SKIP BUTTON ================= */
+.skip-btn {
+  width: 100%;
+  padding: 12px;
+  background: #000;
+  border: 1px solid #fff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.skip-btn:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .quiz-section {
+    padding: 18px;
+  }
+
+  .question-text {
+    font-size: 14px;
+  }
+}
