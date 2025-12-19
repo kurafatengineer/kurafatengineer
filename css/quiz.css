@@ -140,3 +140,6 @@ body {
   background:#fff;
   width:0%;
 }
+.hidden {
+  display: none;
+}
