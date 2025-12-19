@@ -1,55 +1,58 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-const SHEET_ID = "1--MzYQ98U_dSVmdDwY-aGAxba2XgiLXJlttJvLPtQvU";
-const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=PYQs`;
+  /* ================= CONFIG ================= */
+  const SHEET_ID = "1--MzYQ98U_dSVmdDwY-aGAxba2XgiLXJlttJvLPtQvU";
+  const SHEET_NAME = "PYQs";
+  const SHEET_URL =
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
 
-let allQuestions = [];
-let questions = [];
-let index = 0;
-let answered = false;
+  /* ================= STATE ================= */
+  let allQuestions = [];
+  let questions = [];
+  let index = 0;
+  let answered = false;
 
-let stats = { c: 0, i: 0, s: 0, u: 0 };
+  let stats = { c: 0, i: 0, s: 0, u: 0 };
 
-/* ---------------- TOGGLES ---------------- */
-toggleFilter.onclick = () =>
-  filterPanel.classList.toggle("hidden");
+  /* ================= FETCH DATA ================= */
+  fetch(SHEET_URL)
+    .then(res => res.text())
+    .then(text => {
+      const json = JSON.parse(text.substring(47).slice(0, -2));
 
-toggleProgress.onclick = () =>
-  progressPanel.classList.toggle("hidden");
+      json.table.rows.forEach(row => {
+        if (!row.c[4] || !row.c[11]) return;
 
-/* ---------------- FILTER COLLAPSE ---------------- */
-document.querySelectorAll(".filter-group h4").forEach(h => {
-  h.onclick = () => h.parentElement.classList.toggle("open");
-});
-
-/* ---------------- FETCH DATA ---------------- */
-fetch(URL)
-  .then(res => res.text())
-  .then(text => {
-    const json = JSON.parse(text.substring(47).slice(0, -2));
-
-    json.table.rows.forEach(row => {
-      if (!row.c[4] || !row.c[11]) return;
-
-      allQuestions.push({
-        exam: row.c[0]?.v || "",
-        year: row.c[1]?.v || "",
-        paper: row.c[2]?.v || "",
-        questionRaw: row.c[4].v,
-        correct: row.c[11].v.toLowerCase(), // FIX
-        subject: row.c[12]?.v || "",
-        topic: row.c[13]?.v || ""
+        allQuestions.push({
+          exam: row.c[0]?.v || "",
+          year: row.c[1]?.v || "",
+          paper: row.c[2]?.v || "",
+          question: row.c[4].v,
+          correct: row.c[11].v.toLowerCase(),
+          subject: row.c[12]?.v || "",
+          topic: row.c[13]?.v || ""
+        });
       });
+
+      questions = [...allQuestions];
+      stats.u = questions.length;
+
+      populateFilters();
+      updateStats();
+      showQuestion();
     });
 
-    populateFilters();
-    applyFilters();   // IMPORTANT
-  });
+  /* ================= FILTERS ================= */
+  function populateFilters() {
+    fillFilter("filter-exam", "exam");
+    fillFilter("filter-year", "year");
+    fillFilter("filter-paper", "paper");
+    fillFilter("filter-subject", "subject");
+    fillFilter("filter-topic", "topic");
+  }
 
-/* ---------------- FILTERS ---------------- */
-function populateFilters() {
-  ["exam","year","paper","subject","topic"].forEach(key => {
-    const el = document.getElementById(`filter-${key}`);
+  function fillFilter(id, key) {
+    const el = document.getElementById(id);
     el.innerHTML = "";
 
     [...new Set(allQuestions.map(q => q[key]).filter(Boolean))]
@@ -62,115 +65,130 @@ function populateFilters() {
           </label>
         `;
       });
-  });
-}
-
-document.addEventListener("change", e => {
-  if (e.target.type === "checkbox") applyFilters();
-});
-
-function applyFilters() {
-  const get = id =>
-    [...document.querySelectorAll(`#filter-${id} input:checked`)]
-      .map(i => i.value);
-
-  const hasFilter =
-    ["exam","year","paper","subject","topic"]
-    .some(k => get(k).length);
-
-  questions = hasFilter
-    ? allQuestions.filter(q =>
-        (!get("exam").length || get("exam").includes(q.exam)) &&
-        (!get("year").length || get("year").includes(q.year)) &&
-        (!get("paper").length || get("paper").includes(q.paper)) &&
-        (!get("subject").length || get("subject").includes(q.subject)) &&
-        (!get("topic").length || get("topic").includes(q.topic))
-      )
-    : [...allQuestions]; // FIX
-
-  index = 0;
-  stats = { c: 0, i: 0, s: 0, u: questions.length };
-  updateStats();
-  showQuestion();
-}
-
-/* ---------------- SHOW QUESTION ---------------- */
-function showQuestion() {
-  answered = false;
-
-  if (!questions.length || index >= questions.length) {
-    question.innerText = "No questions found.";
-    options.innerHTML = "";
-    return;
   }
 
-  const q = questions[index];
+  document.addEventListener("change", e => {
+    if (e.target.type !== "checkbox") return;
 
-  examCombined.innerText = `${q.exam} • ${q.year}`;
-  examPaper.innerText = q.paper;
+    const get = id =>
+      [...document.querySelectorAll(`#${id} input:checked`)]
+        .map(i => i.value);
 
-  /* Extract question text safely */
-  const split = q.questionRaw.split(/\([A-Da-d]\)/);
-  question.innerText = split[0].trim();
+    questions = allQuestions.filter(q =>
+      (!get("filter-exam").length || get("filter-exam").includes(q.exam)) &&
+      (!get("filter-year").length || get("filter-year").includes(q.year)) &&
+      (!get("filter-paper").length || get("filter-paper").includes(q.paper)) &&
+      (!get("filter-subject").length || get("filter-subject").includes(q.subject)) &&
+      (!get("filter-topic").length || get("filter-topic").includes(q.topic))
+    );
 
-  options.innerHTML = "";
-
-  /* Extract options */
-  const regex = /\(([A-Da-d])\)\s*([^()]+)/g;
-  let match;
-
-  while ((match = regex.exec(q.questionRaw)) !== null) {
-    const key = match[1].toLowerCase();
-    const text = match[2].trim();
-
-    const btn = document.createElement("button");
-    btn.className = "option-btn";
-    btn.innerHTML = `<span class="key">${key.toUpperCase()}</span>${text}`;
-    btn.onclick = () => answer(btn, key);
-    options.appendChild(btn);
-  }
-}
-
-/* ---------------- ANSWER ---------------- */
-function answer(btn, key) {
-  if (answered) return;
-  answered = true;
-
-  stats.u--;
-
-  document.querySelectorAll(".option-btn").forEach(b => {
-    const k = b.querySelector(".key").innerText.toLowerCase();
-    if (k === questions[index].correct) b.classList.add("correct");
+    index = 0;
+    stats = { c: 0, i: 0, s: 0, u: questions.length };
+    updateStats();
+    showQuestion();
   });
 
-  key === questions[index].correct ? stats.c++ : stats.i++;
-  updateStats();
+  /* ================= SHOW QUESTION ================= */
+  function showQuestion() {
+    answered = false;
 
-  setTimeout(() => {
+    if (index >= questions.length) {
+      showResult();
+      return;
+    }
+
+    const q = questions[index];
+
+    document.getElementById("exam-name").innerText = q.exam;
+    document.getElementById("exam-year").innerText = q.year;
+    document.getElementById("exam-paper").innerText = q.paper;
+
+    const questionText = q.question.replace(/\([a-e]\)[\s\S]*/i, "").trim();
+    document.getElementById("question").innerText = questionText;
+
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+
+    const regex = /\(([a-e])\)\s*([^()]+)/gi;
+    [...q.question.matchAll(regex)].forEach(m => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.dataset.key = m[1].toLowerCase();
+      btn.innerText = `${m[1].toUpperCase()}. ${m[2]}`;
+      btn.onclick = () => answer(btn);
+      optionsDiv.appendChild(btn);
+    });
+  }
+
+  /* ================= ANSWER ================= */
+  function answer(btn) {
+    if (answered) return;
+    answered = true;
+
+    stats.u--;
+    const correct = questions[index].correct;
+
+    document.querySelectorAll(".option-btn").forEach(b => {
+      b.disabled = true;
+      if (b.dataset.key === correct) b.classList.add("correct");
+      if (b === btn && b.dataset.key !== correct) b.classList.add("wrong");
+    });
+
+    btn.dataset.key === correct ? stats.c++ : stats.i++;
+    updateStats();
+
+    setTimeout(next, 1200);
+  }
+
+  /* ================= SKIP ================= */
+  document.getElementById("skipBtn").onclick = () => {
+    if (answered) return;
+    answered = true;
+    stats.u--;
+    stats.s++;
+    updateStats();
+    next();
+  };
+
+  function next() {
     index++;
     showQuestion();
-  }, 900);
-}
+  }
 
-/* ---------------- SKIP ---------------- */
-skipBtn.onclick = () => {
-  if (answered) return;
-  stats.u--;
-  stats.s++;
-  index++;
-  updateStats();
-  showQuestion();
-};
+  /* ================= STATS ================= */
+  function updateStats() {
+    const total = stats.c + stats.i + stats.s + stats.u || 1;
 
-/* ---------------- STATS ---------------- */
-function updateStats() {
-  const total = stats.c + stats.i + stats.s + stats.u || 1;
+    ["c", "i", "s", "u"].forEach(k => {
+      document.getElementById(`count-${k}`).innerText = stats[k];
+      document.getElementById(`bar-${k}`).style.width =
+        (stats[k] / total) * 100 + "%";
+    });
+  }
 
-  ["c","i","s","u"].forEach(k => {
-    document.getElementById(`count-${k}`).innerText = stats[k];
-    document.getElementById(`bar-${k}`).style.width =
-      (stats[k] / total) * 100 + "%";
-  });
-}
+  /* ================= RESULT ================= */
+  function showResult() {
+    const total = stats.c + stats.i + stats.s + stats.u;
+
+    const deg = v => (v / total) * 360;
+    const c = deg(stats.c);
+    const i = c + deg(stats.i);
+    const s = i + deg(stats.s);
+
+    document.getElementById("donutChart").style.background =
+      `conic-gradient(
+        #fff 0deg ${c}deg,
+        #777 ${c}deg ${i}deg,
+        #444 ${i}deg ${s}deg,
+        #222 ${s}deg 360deg
+      )`;
+
+    document.getElementById("r-c").innerText = stats.c;
+    document.getElementById("r-i").innerText = stats.i;
+    document.getElementById("r-s").innerText = stats.s;
+    document.getElementById("r-u").innerText = stats.u;
+
+    document.getElementById("resultOverlay").style.display = "flex";
+  }
 
 });
