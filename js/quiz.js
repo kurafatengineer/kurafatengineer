@@ -1,5 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  /* ================= FILTER TOGGLE ================= */
+  document.querySelectorAll(".filter-group h4").forEach(h => {
+    h.addEventListener("click", () => {
+      h.parentElement.classList.toggle("open");
+    });
+  });
+
   /* ================= CONFIG ================= */
   const SHEET_ID = "1--MzYQ98U_dSVmdDwY-aGAxba2XgiLXJlttJvLPtQvU";
   const SHEET_NAME = "PYQs";
@@ -11,26 +18,24 @@ document.addEventListener("DOMContentLoaded", () => {
   let questions = [];
   let index = 0;
   let answered = false;
-
   let stats = { c: 0, i: 0, s: 0, u: 0 };
 
-  /* ================= FETCH DATA ================= */
+  /* ================= FETCH ================= */
   fetch(SHEET_URL)
-    .then(res => res.text())
-    .then(text => {
-      const json = JSON.parse(text.substring(47).slice(0, -2));
+    .then(r => r.text())
+    .then(t => {
+      const json = JSON.parse(t.substring(47).slice(0, -2));
 
-      json.table.rows.forEach(row => {
-        if (!row.c[4] || !row.c[11]) return;
-
+      json.table.rows.forEach(r => {
+        if (!r.c[4] || !r.c[11]) return;
         allQuestions.push({
-          exam: row.c[0]?.v || "",
-          year: row.c[1]?.v || "",
-          paper: row.c[2]?.v || "",
-          question: row.c[4].v,
-          correct: row.c[11].v.toLowerCase(),
-          subject: row.c[12]?.v || "",
-          topic: row.c[13]?.v || ""
+          exam: r.c[0]?.v || "",
+          year: r.c[1]?.v || "",
+          paper: r.c[2]?.v || "",
+          question: r.c[4].v,
+          correct: r.c[11].v.toLowerCase(),
+          subject: r.c[12]?.v || "",
+          topic: r.c[13]?.v || ""
         });
       });
 
@@ -54,16 +59,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function fillFilter(id, key) {
     const el = document.getElementById(id);
     el.innerHTML = "";
-
     [...new Set(allQuestions.map(q => q[key]).filter(Boolean))]
       .sort()
-      .forEach(val => {
+      .forEach(v => {
         el.innerHTML += `
           <label>
-            <input type="checkbox" value="${val}">
-            ${val}
-          </label>
-        `;
+            <input type="checkbox" value="${v}"> ${v}
+          </label>`;
       });
   }
 
@@ -88,44 +90,40 @@ document.addEventListener("DOMContentLoaded", () => {
     showQuestion();
   });
 
-  /* ================= SHOW QUESTION ================= */
+  /* ================= QUESTION ================= */
   function showQuestion() {
     answered = false;
-
-    if (index >= questions.length) {
-      showResult();
-      return;
-    }
+    if (index >= questions.length) return showResult();
 
     const q = questions[index];
 
-    document.getElementById("exam-name").innerText = q.exam;
-    document.getElementById("exam-year").innerText = q.year;
+    document.getElementById("exam-info").innerText =
+      `${q.exam} ${q.year}`.trim();
     document.getElementById("exam-paper").innerText = q.paper;
 
-    const questionText = q.question.replace(/\([a-e]\)[\s\S]*/i, "").trim();
-    document.getElementById("question").innerText = questionText;
+    document.getElementById("question").innerText =
+      q.question.replace(/\([a-e]\)[\s\S]*/i, "").trim();
 
-    const optionsDiv = document.getElementById("options");
-    optionsDiv.innerHTML = "";
+    const opt = document.getElementById("options");
+    opt.innerHTML = "";
 
-    const regex = /\(([a-e])\)\s*([^()]+)/gi;
-    [...q.question.matchAll(regex)].forEach(m => {
-      const btn = document.createElement("button");
-      btn.className = "option-btn";
-      btn.dataset.key = m[1].toLowerCase();
-      btn.innerText = `${m[1].toUpperCase()}. ${m[2]}`;
-      btn.onclick = () => answer(btn);
-      optionsDiv.appendChild(btn);
-    });
+    [...q.question.matchAll(/\(([a-e])\)\s*([^()]+)/gi)]
+      .forEach(m => {
+        const b = document.createElement("button");
+        b.className = "option-btn";
+        b.dataset.key = m[1].toLowerCase();
+        b.innerText = `${m[1].toUpperCase()}. ${m[2]}`;
+        b.onclick = () => answer(b);
+        opt.appendChild(b);
+      });
   }
 
   /* ================= ANSWER ================= */
   function answer(btn) {
     if (answered) return;
     answered = true;
-
     stats.u--;
+
     const correct = questions[index].correct;
 
     document.querySelectorAll(".option-btn").forEach(b => {
@@ -136,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btn.dataset.key === correct ? stats.c++ : stats.i++;
     updateStats();
-
     setTimeout(next, 1200);
   }
 
@@ -158,7 +155,6 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= STATS ================= */
   function updateStats() {
     const total = stats.c + stats.i + stats.s + stats.u || 1;
-
     ["c", "i", "s", "u"].forEach(k => {
       document.getElementById(`count-${k}`).innerText = stats[k];
       document.getElementById(`bar-${k}`).style.width =
@@ -168,26 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ================= RESULT ================= */
   function showResult() {
-    const total = stats.c + stats.i + stats.s + stats.u;
-
-    const deg = v => (v / total) * 360;
-    const c = deg(stats.c);
-    const i = c + deg(stats.i);
-    const s = i + deg(stats.s);
-
-    document.getElementById("donutChart").style.background =
-      `conic-gradient(
-        #fff 0deg ${c}deg,
-        #777 ${c}deg ${i}deg,
-        #444 ${i}deg ${s}deg,
-        #222 ${s}deg 360deg
-      )`;
-
-    document.getElementById("r-c").innerText = stats.c;
-    document.getElementById("r-i").innerText = stats.i;
-    document.getElementById("r-s").innerText = stats.s;
-    document.getElementById("r-u").innerText = stats.u;
-
     document.getElementById("resultOverlay").style.display = "flex";
   }
 
