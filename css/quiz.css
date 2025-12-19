@@ -259,3 +259,50 @@ body.stats-open #quiz-container { margin-right: 220px; }
 }
 
 /* ================= 
+
+
+/* ================= RESULT OVERLAY ================= */
+
+#resultOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+}
+
+.result-card {
+  background: #000;
+  border: 1px solid #555;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  width: 280px;
+}
+
+#donutChart {
+  width: 160px;
+  height: 160px;
+  margin: 20px auto;
+  border-radius: 50%;
+  background: conic-gradient(#fff 0deg, #222 0deg);
+}
+
+.result-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.result-card li {
+  font-size: 14px;
+  margin: 6px 0;
+}
+
+.reset-msg {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 10px;
+}
