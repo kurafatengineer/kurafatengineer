@@ -1,157 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Quiz Page</title>
-
-  <!-- ================= COMMON CSS ================= -->
-  <link rel="stylesheet" href="css/common.css" />
-
-  <!-- ================= QUIZ CSS ================= -->
-  <link rel="stylesheet" href="css/quiz.css" />
-
-  <!-- ================= FONT AWESOME (REQUIRED) ================= -->
-  <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <meta charset="UTF-8">
+    <title>PYQs Quiz</title>
+    <link rel="stylesheet" href="css/common.css">
 </head>
-
 <body>
 
-<!-- ================= HEADER (AUTO LOAD) ================= -->
 <div id="header"></div>
 
-<!-- ================= QUIZ PAGE ================= -->
-<main class="quiz-page">
+<!-- SECTION B : TOGGLES -->
+<section id="toggles">
+    <button id="filterToggle">Toggle Filters</button>
+    <button id="soundToggle">Sound: ON</button>
+    <button id="progressToggle">Toggle Progress</button>
 
-  <!-- ================= FILTER PANEL ================= -->
-  <aside class="filter-panel">
-    <h3>Filter Questions</h3>
+    <label>
+        <input type="radio" name="medium" value="English" checked> English
+    </label>
+    <label>
+        <input type="radio" name="medium" value="Hindi"> Hindi
+    </label>
+</section>
 
-    <div class="filter-group">
-      <h4>Year</h4>
-      <div class="filter-list" id="filter-year"></div>
+<!-- SECTION A : FILTERS -->
+<section id="filters">
+    <h3 id="filterHeader">Filters</h3>
+
+    <div class="filter" data-filter="Year">
+        <input type="text" placeholder="Search Year">
+        <div class="options"></div>
     </div>
 
-    <div class="filter-group">
-      <h4>Exam</h4>
-      <div class="filter-list" id="filter-exam"></div>
+    <div class="filter" data-filter="Exam">
+        <input type="text" placeholder="Search Exam">
+        <div class="options"></div>
     </div>
 
-    <div class="filter-group">
-      <h4>Topic</h4>
-      <div class="filter-list" id="filter-topic"></div>
+    <div class="filter" data-filter="Topic">
+        <input type="text" placeholder="Search Topic">
+        <div class="options"></div>
     </div>
 
-    <div class="filter-group">
-      <h4>Paper</h4>
-      <div class="filter-list" id="filter-paper"></div>
+    <div class="filter" data-filter="Paper">
+        <input type="text" placeholder="Search Paper">
+        <div class="options"></div>
     </div>
 
-    <div class="filter-group">
-      <h4>Subject</h4>
-      <div class="filter-list" id="filter-subject"></div>
+    <div class="filter" data-filter="Subject">
+        <input type="text" placeholder="Search Subject">
+        <div class="options"></div>
     </div>
-  </aside>
+</section>
 
-  <!-- ================= QUIZ SECTION ================= -->
-  <section class="quiz-section">
+<!-- SECTION C : QUIZ -->
+<section id="quiz">
+    <div id="quizMeta"></div>
+    <div id="question"></div>
+    <div id="options"></div>
+    <button id="skipBtn">Skip</button>
+</section>
 
-    <!-- Exam Details -->
-    <div class="exam-details">
-      <span id="exam-name">Exam Name</span>
-      <span id="exam-year">Year</span>
-      <span id="exam-paper">Paper</span>
-    </div>
+<!-- SECTION D : MAINS -->
+<section id="mains" style="display:none;">
+    <h2>Mains Questions</h2>
+    <div id="mainsContent"></div>
+</section>
 
-    <!-- Question -->
-    <div class="question-card">
-      <div class="question-text" id="question">
-        Question text will appear here
-      </div>
-    </div>
+<!-- SECTION E : PROGRESS -->
+<section id="progress">
+    <h3>Progress</h3>
+    <div id="progressStats"></div>
+</section>
 
-    <!-- Options -->
-    <div class="options" id="options"></div>
+<!-- SECTION F : RESULT -->
+<section id="result" style="display:none;">
+    <canvas id="resultChart" width="300" height="300"></canvas>
+    <p id="restart">Click to Restart</p>
+</section>
 
-    <!-- Skip -->
-    <button class="skip-btn" id="skipBtn">
-      Skip Question
-    </button>
-
-  </section>
-
-  <!-- ================= PROGRESS REPORT ================= -->
-  <aside class="progress-panel">
-    <h3>Progress Report</h3>
-
-    <div class="progress-item">
-      <span>C</span>
-      <div class="bar"><div id="bar-c"></div></div>
-      <span id="count-c">0</span>
-    </div>
-
-    <div class="progress-item">
-      <span>I</span>
-      <div class="bar"><div id="bar-i"></div></div>
-      <span id="count-i">0</span>
-    </div>
-
-    <div class="progress-item">
-      <span>S</span>
-      <div class="bar"><div id="bar-s"></div></div>
-      <span id="count-s">0</span>
-    </div>
-
-    <div class="progress-item">
-      <span>U</span>
-      <div class="bar"><div id="bar-u"></div></div>
-      <span id="count-u">0</span>
-    </div>
-  </aside>
-
-</main>
-
-<!-- ================= RESULT CARD ================= -->
-<div class="result-overlay" id="resultOverlay">
-  <div class="result-card">
-
-    <h2>Quiz Result</h2>
-
-    <!-- Donut Chart -->
-    <div class="donut-chart" id="donutChart"></div>
-
-    <!-- Result Details -->
-    <ul class="result-stats">
-      <li>✔ Correct (C): <span id="r-c">0</span></li>
-      <li>✖ Incorrect (I): <span id="r-i">0</span></li>
-      <li>➟ Skipped (S): <span id="r-s">0</span></li>
-      <li>○ Unattempted (U): <span id="r-u">0</span></li>
-    </ul>
-
-    <p class="reset-info">
-      Quiz will reset automatically in 10 seconds
-    </p>
-
-  </div>
-</div>
-
-<!-- ================= FOOTER (AUTO LOAD) ================= -->
 <div id="footer"></div>
 
-<!-- ================= SCRIPTS ================= -->
 <script src="js/quiz.js"></script>
-
-<script>
-  // Load common header
-  fetch("partials/header.html")
-    .then(res => res.text())
-    .then(html => document.getElementById("header").innerHTML = html);
-
-  // Load common footer
-  fetch("partials/footer.html")
-    .then(res => res.text())
-    .then(html => document.getElementById("footer").innerHTML = html);
-</script>
-
 </body>
 </html>
