@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Quiz Page</title>
 
-  <!-- Common CSS (Header + Footer) -->
+  <!-- Common CSS -->
   <link rel="stylesheet" href="css/common.css" />
 
   <!-- Quiz specific CSS -->
@@ -13,10 +13,8 @@
 
 <body>
 
-<!-- ================= COMMON HEADER ================= -->
-<header class="site-header">
-  <!-- same header as index.html -->
-</header>
+<!-- ================= HEADER (AUTO LOAD) ================= -->
+<div id="header"></div>
 
 <!-- ================= QUIZ PAGE ================= -->
 <main class="quiz-page">
@@ -54,26 +52,20 @@
   <!-- ================= QUIZ SECTION ================= -->
   <section class="quiz-section">
 
-    <!-- Exam Details -->
     <div class="exam-details">
       <span id="exam-name">Exam Name</span>
       <span id="exam-year">Year</span>
       <span id="exam-paper">Paper</span>
     </div>
 
-    <!-- Question -->
     <div class="question-card">
       <div class="question-text" id="question">
         Question text will appear here
       </div>
     </div>
 
-    <!-- Options -->
-    <div class="options" id="options">
-      <!-- option buttons injected via JS -->
-    </div>
+    <div class="options" id="options"></div>
 
-    <!-- Skip -->
     <button class="skip-btn" id="skipBtn">
       Skip Question
     </button>
@@ -117,10 +109,8 @@
 
     <h2>Quiz Result</h2>
 
-    <!-- Donut Chart -->
     <div class="donut-chart" id="donutChart"></div>
 
-    <!-- Result Details -->
     <ul class="result-stats">
       <li>✔ Correct (C): <span id="r-c">0</span></li>
       <li>✖ Incorrect (I): <span id="r-i">0</span></li>
@@ -135,13 +125,21 @@
   </div>
 </div>
 
-<!-- ================= COMMON FOOTER ================= -->
-<footer class="site-footer">
-  <!-- same footer as index.html -->
-</footer>
+<!-- ================= FOOTER (AUTO LOAD) ================= -->
+<div id="footer"></div>
 
-<!-- Quiz JS -->
+<!-- ================= SCRIPTS ================= -->
 <script src="js/quiz.js"></script>
+
+<script>
+  fetch("partials/header.html")
+    .then(res => res.text())
+    .then(html => document.getElementById("header").innerHTML = html);
+
+  fetch("partials/footer.html")
+    .then(res => res.text())
+    .then(html => document.getElementById("footer").innerHTML = html);
+</script>
 
 </body>
 </html>
