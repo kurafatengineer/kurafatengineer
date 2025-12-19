@@ -1,85 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Quiz</title>
-<link rel="stylesheet" href="quiz.css">
-<link rel="stylesheet"
- href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <meta charset="UTF-8" />
+  <title>Quiz Page</title>
+
+  <!-- ================= COMMON CSS ================= -->
+  <link rel="stylesheet" href="css/common.css" />
+
+  <!-- ================= QUIZ CSS ================= -->
+  <link rel="stylesheet" href="css/quiz.css" />
+
+  <!-- ================= FONT AWESOME (REQUIRED) ================= -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 
 <body>
 
-<!-- TOGGLES -->
-<button id="toggleFilter" class="side-toggle left">
-  <i class="fa-solid fa-filter"></i>
-</button>
+<!-- ================= HEADER (AUTO LOAD) ================= -->
+<div id="header"></div>
 
-<button id="toggleProgress" class="side-toggle right">
-  <i class="fa-solid fa-chart-pie"></i>
-</button>
-
+<!-- ================= QUIZ PAGE ================= -->
 <main class="quiz-page">
 
-<!-- FILTER -->
-<aside class="filter-panel" id="filterPanel">
-  <h3>Filters</h3>
+  <!-- ================= FILTER PANEL ================= -->
+  <aside class="filter-panel">
+    <h3>Filter Questions</h3>
 
-  <div class="filter-group">
-    <h4>Exam</h4>
-    <div class="filter-list" id="filter-exam"></div>
-  </div>
+    <div class="filter-group">
+      <h4>Year</h4>
+      <div class="filter-list" id="filter-year"></div>
+    </div>
 
-  <div class="filter-group">
-    <h4>Year</h4>
-    <div class="filter-list" id="filter-year"></div>
-  </div>
+    <div class="filter-group">
+      <h4>Exam</h4>
+      <div class="filter-list" id="filter-exam"></div>
+    </div>
 
-  <div class="filter-group">
-    <h4>Paper</h4>
-    <div class="filter-list" id="filter-paper"></div>
-  </div>
+    <div class="filter-group">
+      <h4>Topic</h4>
+      <div class="filter-list" id="filter-topic"></div>
+    </div>
 
-  <div class="filter-group">
-    <h4>Subject</h4>
-    <div class="filter-list" id="filter-subject"></div>
-  </div>
+    <div class="filter-group">
+      <h4>Paper</h4>
+      <div class="filter-list" id="filter-paper"></div>
+    </div>
 
-  <div class="filter-group">
-    <h4>Topic</h4>
-    <div class="filter-list" id="filter-topic"></div>
-  </div>
-</aside>
+    <div class="filter-group">
+      <h4>Subject</h4>
+      <div class="filter-list" id="filter-subject"></div>
+    </div>
+  </aside>
 
-<!-- QUIZ -->
-<section class="quiz-section">
+  <!-- ================= QUIZ SECTION ================= -->
+  <section class="quiz-section">
 
-  <div class="exam-details">
-    <span id="examCombined"></span>
-    <span id="examPaper"></span>
-  </div>
+    <!-- Exam Details -->
+    <div class="exam-details">
+      <span id="exam-name">Exam Name</span>
+      <span id="exam-year">Year</span>
+      <span id="exam-paper">Paper</span>
+    </div>
 
-  <div class="question-card">
-    <div id="question"></div>
-  </div>
+    <!-- Question -->
+    <div class="question-card">
+      <div class="question-text" id="question">
+        Question text will appear here
+      </div>
+    </div>
 
-  <div class="options" id="options"></div>
+    <!-- Options -->
+    <div class="options" id="options"></div>
 
-  <button class="skip-btn" id="skipBtn">Skip</button>
-</section>
+    <!-- Skip -->
+    <button class="skip-btn" id="skipBtn">
+      Skip Question
+    </button>
 
-<!-- PROGRESS -->
-<aside class="progress-panel" id="progressPanel">
-  <h3>Progress</h3>
+  </section>
 
-  <div class="progress-item"><span>C</span><div class="bar"><div id="bar-c"></div></div><span id="count-c">0</span></div>
-  <div class="progress-item"><span>I</span><div class="bar"><div id="bar-i"></div></div><span id="count-i">0</span></div>
-  <div class="progress-item"><span>S</span><div class="bar"><div id="bar-s"></div></div><span id="count-s">0</span></div>
-  <div class="progress-item"><span>U</span><div class="bar"><div id="bar-u"></div></div><span id="count-u">0</span></div>
-</aside>
+  <!-- ================= PROGRESS REPORT ================= -->
+  <aside class="progress-panel">
+    <h3>Progress Report</h3>
+
+    <div class="progress-item">
+      <span>C</span>
+      <div class="bar"><div id="bar-c"></div></div>
+      <span id="count-c">0</span>
+    </div>
+
+    <div class="progress-item">
+      <span>I</span>
+      <div class="bar"><div id="bar-i"></div></div>
+      <span id="count-i">0</span>
+    </div>
+
+    <div class="progress-item">
+      <span>S</span>
+      <div class="bar"><div id="bar-s"></div></div>
+      <span id="count-s">0</span>
+    </div>
+
+    <div class="progress-item">
+      <span>U</span>
+      <div class="bar"><div id="bar-u"></div></div>
+      <span id="count-u">0</span>
+    </div>
+  </aside>
 
 </main>
 
-<script src="quiz.js"></script>
+<!-- ================= RESULT CARD ================= -->
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-card">
+
+    <h2>Quiz Result</h2>
+
+    <!-- Donut Chart -->
+    <div class="donut-chart" id="donutChart"></div>
+
+    <!-- Result Details -->
+    <ul class="result-stats">
+      <li>✔ Correct (C): <span id="r-c">0</span></li>
+      <li>✖ Incorrect (I): <span id="r-i">0</span></li>
+      <li>➟ Skipped (S): <span id="r-s">0</span></li>
+      <li>○ Unattempted (U): <span id="r-u">0</span></li>
+    </ul>
+
+    <p class="reset-info">
+      Quiz will reset automatically in 10 seconds
+    </p>
+
+  </div>
+</div>
+
+<!-- ================= FOOTER (AUTO LOAD) ================= -->
+<div id="footer"></div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="js/quiz.js"></script>
+
+<script>
+  // Load common header
+  fetch("partials/header.html")
+    .then(res => res.text())
+    .then(html => document.getElementById("header").innerHTML = html);
+
+  // Load common footer
+  fetch("partials/footer.html")
+    .then(res => res.text())
+    .then(html => document.getElementById("footer").innerHTML = html);
+</script>
+
 </body>
 </html>
