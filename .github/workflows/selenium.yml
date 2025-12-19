@@ -1,16 +1,16 @@
-name: Government Exam Monitor
+name: SSC Selenium Monitor
 
 on:
-  schedule:
-    - cron: "*/5 * * * *"
   workflow_dispatch:
+  schedule:
+    - cron: "0 */6 * * *"   # हर 6 घंटे में
 
 jobs:
-  monitor:
+  selenium:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -20,11 +20,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4
+          pip install selenium requests
 
-      - name: Run monitor script
+      - name: Install Chrome
+        run: |
+          sudo apt update
+          sudo apt install -y google-chrome-stable
+
+      - name: Run Selenium script
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
-          python monitor/monitor.py
+          python monitor/ssc_selenium.py
