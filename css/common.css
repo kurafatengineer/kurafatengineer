@@ -27,7 +27,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 18px;
-  padding: 18px 0;
+  padding: 18px 16px;
 }
 
 /* horizontal lines */
@@ -39,22 +39,38 @@ body {
   opacity: 0.9;
 }
 
-/* center icon */
-.header-icon {
-  font-size: 22px;
-  color: #fff;
+/* brand group */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  cursor: default;
+}
+
+/* brand icon */
+.brand-icon {
+  font-size: 20px;
   transition: transform 0.3s ease, text-shadow 0.3s ease;
 }
 
+/* brand name */
+.brand-name {
+  font-size: 20px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
 /* hover effect */
-.header-icon:hover {
+.brand:hover .brand-icon {
   transform: scale(1.15);
   text-shadow: 0 0 10px rgba(255,255,255,0.5);
 }
 
-/* Space for fixed header */
+/* spacing for fixed header */
 main {
-  padding-top: 85px;
+  padding-top: 95px;
 }
 
 /* ================= FOOTER ================= */
@@ -126,11 +142,16 @@ main {
 /* ================= RESPONSIVE ================= */
 @media (max-width: 600px) {
   .header-decor .line {
-    max-width: 80px;
+    max-width: 70px;
+  }
+
+  .brand-name {
+    font-size: 16px;
+    letter-spacing: 1.5px;
   }
 
   main {
-    padding-top: 75px;
+    padding-top: 85px;
   }
 
   .social-links {
