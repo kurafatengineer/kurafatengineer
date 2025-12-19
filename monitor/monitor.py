@@ -12,8 +12,8 @@ URLS = [
 ]
 
 # Telegram के लिए बोट टोकन और चैट आईडी
-BOT_TOKEN = os.getenv("8435142881:AAF1j4yKt9RVVNpWVkO0Y50pj1c8oKU-s1Q")
-CHAT_ID = os.getenv("projectjarurat")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+CHAT_ID = os.getenv("CHAT_ID")
 
 # हर वेबसाइट के लिए पिछले नोटिफिकेशन का हैश स्टोर करने के लिए एक डिक्शनरी
 LAST_HASHES = {}
