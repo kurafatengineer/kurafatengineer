@@ -1,145 +1,286 @@
-body {
-  background:#000;
-  color:#fff;
-  font-family:Arial;
-}
-
+/* ================= PAGE STACK LAYOUT ================= */
 .quiz-page {
-  max-width:720px;
-  margin:auto;
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
-.side-toggle {
-  position:fixed;
-  top:50%;
-  padding:10px;
-  border:1px solid #fff;
-  background:#000;
-  color:#fff;
-  cursor:pointer;
-  z-index:100;
+/* ================= FILTER PANEL (TOP) ================= */
+.filter-panel {
+  width: 100%;
+  max-width: 720px;
+  border: 1px solid #fff;
+  padding: 16px;
+  border-radius: 18px;
 }
 
-.left { left:10px }
-.right { right:10px }
-
-.filter-panel,
-.progress-panel {
-  border:1px solid #fff;
-  padding:16px;
-  border-radius:18px;
-  margin-bottom:16px;
+/* filter title */
+.filter-panel h3 {
+  font-size: 13px;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
 }
 
+/* filter groups */
+.filter-group {
+  margin-bottom: 12px;
+}
+
+/* clickable heading for collapse */
 .filter-group h4 {
-  cursor:pointer;
-  margin:8px 0;
+  font-size: 12px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
+/* search input (circular corners) */
+.filter-group input[type="text"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #fff;
+  background: #000;
+  color: #fff;
+  border-radius: 18px;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.filter-group input::placeholder {
+  color: #fff;
+  opacity: 0.7;
+}
+
+/* filter list (collapsed by default) */
 .filter-list {
-  max-height:0;
-  overflow:hidden;
-  transition:0.3s;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
 }
 
+/* expand state (add via JS) */
 .filter-group.open .filter-list {
-  max-height:160px;
+  max-height: 160px;
+  overflow-y: auto;
 }
 
+/* checkbox row */
 .filter-list label {
-  display:flex;
-  gap:6px;
-  font-size:12px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
+/* no gap between checkbox & text */
+.filter-list input[type="checkbox"] {
+  margin: 0 2px 0 0;
+}
+
+/* ================= QUIZ SECTION ================= */
 .quiz-section {
-  border:1px solid #fff;
-  padding:20px;
-  border-radius:18px;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  border: 1px solid #fff;
+  padding: 24px;
+  border-radius: 20px;
 }
 
+/* ================= EXAM DETAILS ================= */
 .exam-details {
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:12px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 18px;
 }
 
-.exam-details span {
-  background:#444;
-  padding:6px 12px;
-  border-radius:14px;
-  font-size:12px;
+/* left (exam + year together) */
+.exam-details span:first-child {
+  background: #444;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
 }
 
+/* right (paper) */
+.exam-details span:last-child {
+  background: #444;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+}
+
+/* ================= QUESTION CARD ================= */
 .question-card {
-  border:1px solid #fff;
-  padding:18px;
-  border-radius:18px;
-  margin-bottom:18px;
+  border: 1px solid #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 18px;
 }
 
+.question-text {
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ================= OPTIONS ================= */
 .options {
-  display:flex;
-  flex-direction:column;
-  gap:12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
+/* option button */
 .option-btn {
-  position:relative;
-  padding:14px 14px 14px 50px;
-  border:1px solid #fff;
-  background:#000;
-  color:#fff;
-  border-radius:22px;
-  cursor:pointer;
+  width: 100%;
+  padding: 14px;
+  background: #000;
+  border: 1px solid #fff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  position: relative;
+  border-radius: 22px;
+  transition: all 0.2s ease;
 }
 
-.option-btn span.key {
-  position:absolute;
-  left:14px;
-  top:50%;
-  transform:translateY(-50%);
-  width:26px;
-  height:26px;
-  border-radius:50%;
-  background:#444;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:12px;
+/* option letter circle */
+.option-btn::before {
+  content: attr(data-key);
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  background: #444;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  text-transform: uppercase;
 }
 
-.option-btn.correct { background:#fff; color:#000 }
-.option-btn.wrong { background:#333 }
+/* hover */
+.option-btn:hover {
+  background: #fff;
+  color: #000;
+}
 
+/* correct */
+.option-btn.correct {
+  background: #fff;
+  color: #000;
+}
+
+.option-btn.correct::after {
+  content: "✔";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+}
+
+/* wrong */
+.option-btn.wrong {
+  background: #444;
+  color: #fff;
+  animation: shake 0.3s;
+}
+
+.option-btn.wrong::after {
+  content: "✖";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+}
+
+/* shake animation */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+
+/* ================= SKIP BUTTON ================= */
 .skip-btn {
-  width:100%;
-  margin-top:14px;
-  padding:14px;
-  border-radius:22px;
-  border:1px solid #fff;
-  background:#000;
-  color:#fff;
-  cursor:pointer;
+  width: 100%;
+  padding: 14px;
+  background: #000;
+  border: 1px solid #fff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 22px;
 }
 
+.skip-btn:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* ================= PROGRESS PANEL (BOTTOM) ================= */
+.progress-panel {
+  width: 100%;
+  max-width: 720px;
+  border: 1px solid #fff;
+  padding: 16px;
+  border-radius: 18px;
+}
+
+/* progress title */
+.progress-panel h3 {
+  text-align: center;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* progress rows */
 .progress-item {
-  display:grid;
-  grid-template-columns:20px 1fr 30px;
-  gap:8px;
-  font-size:12px;
+  display: grid;
+  grid-template-columns: 24px 1fr 36px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 10px;
 }
 
+/* progress bar */
 .bar {
-  height:6px;
-  border:1px solid #fff;
+  height: 6px;
+  border: 1px solid #fff;
+  border-radius: 6px;
 }
 
 .bar div {
-  height:100%;
-  background:#fff;
-  width:0%;
+  height: 100%;
+  width: 0%;
+  background: #fff;
+  border-radius: 6px;
 }
-.hidden {
-  display: none;
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .quiz-section {
+    padding: 18px;
+  }
+
+  .question-text {
+    font-size: 14px;
+  }
 }
