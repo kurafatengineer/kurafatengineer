@@ -23,7 +23,7 @@ def send_telegram_message(message):
     requests.post(telegram_url, data=payload)
 
 def get_notifications_from_url(url):
-    response = requests.get(url, timeout=30)  # टाइमआउट बढ़ा दिया है
+    response = requests.get(url, timeout=100)  # टाइमआउट बढ़ा दिया है
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
     
