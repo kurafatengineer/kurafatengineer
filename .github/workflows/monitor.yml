@@ -1,1 +1,25 @@
 
+name: Multi-Site Notification Alert
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"  # हर 10 मिनट में चलाएँ
+  workflow_dispatch:
+
+jobs:
+  check-notifications:
+    runs-on: ubuntu-latest
+    steps:ठीक है 👍 अब मैं **पूरी चीज़ एकदम clear, practical और step-by-step** बता रहा हूँ — ताकि आप **existing GitHub website repo** में ही यह **multi-website notification system** लगा सकें।
+
+आपका use-case मैंने ठीक से समझ लिया है:
+
+- आपकी **website का code पहले से GitHub पर है**
+- आप **multiple government websites** monitor करना चाहते हैं (SSC, UPSC, Railway, etc.)
+- Login नहीं चाहिए
+- New notification आते ही **Telegram alert**
+- Future में वही data आप **अपनी website पर दिखाएँगे**
+- सब कुछ **GitHub Actions** से चले
+
+---
+
+# 🔥 FINAL ARCHITECTURE (Simple words)
