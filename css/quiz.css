@@ -1,3 +1,127 @@
+/* ================= PAGE STACK LAYOUT ================= */
+.quiz-page {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* ================= FILTER PANEL (TOP) ================= */
+.filter-panel {
+  width: 100%;
+  max-width: 720px;
+  border: 1px solid #fff;
+  padding: 16px;
+}
+
+/* filter title */
+.filter-panel h3 {
+  font-size: 13px;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+/* filter groups */
+.filter-group {
+  margin-bottom: 12px;
+}
+
+.filter-group h4 {
+  font-size: 12px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+/* search input (curved, not circular) */
+.filter-group input[type="text"] {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #fff;
+  background: #000;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.filter-group input::placeholder {
+  color: #fff;
+  opacity: 0.7;
+}
+
+/* filter list */
+.filter-list {
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+/* checkbox row */
+.filter-list label {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* no gap between checkbox & text */
+.filter-list input[type="checkbox"] {
+  margin: 0 2px 0 0;
+}
+
+/* ================= PROGRESS PANEL (BOTTOM) ================= */
+.progress-panel {
+  width: 100%;
+  max-width: 720px;
+  border: 1px solid #fff;
+  padding: 16px;
+}
+
+/* progress title */
+.progress-panel h3 {
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* progress rows */
+.progress-item {
+  display: grid;
+  grid-template-columns: 20px 1fr 30px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+/* progress bar */
+.bar {
+  height: 6px;
+  border: 1px solid #fff;
+}
+
+.bar div {
+  height: 100%;
+  width: 0%;
+  background: #fff;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .filter-panel,
+  .progress-panel {
+    padding: 14px;
+  }
+
+  .filter-group h4 {
+    font-size: 11px;
+  }
+}
+
 /* ================= QUIZ SECTION ================= */
 .quiz-section {
   max-width: 720px;
