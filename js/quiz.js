@@ -28,11 +28,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       json.table.rows.forEach(r => {
         if (!r.c[4] || !r.c[11]) return;
+
         allQuestions.push({
           exam: r.c[0]?.v || "",
-          year: r.c[1]?.v || "",
+          year: String(r.c[1]?.v || ""),
           paper: r.c[2]?.v || "",
-          question: r.c[4].v,
+          questionRaw: r.c[4].v,
           correct: r.c[11].v.toLowerCase(),
           subject: r.c[12]?.v || "",
           topic: r.c[13]?.v || ""
@@ -57,18 +58,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function fillFilter(id, key) {
-    const el = document.getElementById(id);
-    el.innerHTML = "";
+    const box = document.getElementById(id);
+    box.innerHTML = "";
+
     [...new Set(allQuestions.map(q => q[key]).filter(Boolean))]
       .sort()
       .forEach(v => {
-        el.innerHTML += `
+        box.innerHTML += `
           <label>
-            <input type="checkbox" value="${v}"> ${v}
+            <input type="checkbox" value="${v}">
+            ${v}
           </label>`;
       });
   }
 
+  /* ================= FILTER SEARCH ================= */
+  document.querySelectorAll(".filter-group input[type='text']")
+    .forEach(input => {
+      input.addEventListener("input", () => {
+        const list = input.parentElement.querySelector(".filter-list");
+        const term = input.value.toLowerCase();
+
+        list.querySelectorAll("label").forEach(l => {
+          l.style.display =
+            l.innerText.toLowerCase().includes(term) ? "flex" : "none";
+        });
+      });
+    });
+
+  /* ================= FILTER APPLY ================= */
   document.addEventListener("change", e => {
     if (e.target.type !== "checkbox") return;
 
@@ -93,7 +111,11 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ================= QUESTION ================= */
   function showQuestion() {
     answered = false;
-    if (index >= questions.length) return showResult();
+
+    if (index >= questions.length) {
+      showResult();
+      return;
+    }
 
     const q = questions[index];
 
@@ -101,21 +123,34 @@ document.addEventListener("DOMContentLoaded", () => {
       `${q.exam} ${q.year}`.trim();
     document.getElementById("exam-paper").innerText = q.paper;
 
-    document.getElementById("question").innerText =
-      q.question.replace(/\([a-e]\)[\s\S]*/i, "").trim();
+    const options = [];
+    const regex = /\(([a-e])\)\s*([^()]+)/gi;
+    let match;
 
-    const opt = document.getElementById("options");
-    opt.innerHTML = "";
+    while ((match = regex.exec(q.questionRaw)) !== null) {
+      options.push({ key: match[1].toLowerCase(), text: match[2].trim() });
+    }
 
-    [...q.question.matchAll(/\(([a-e])\)\s*([^()]+)/gi)]
-      .forEach(m => {
-        const b = document.createElement("button");
-        b.className = "option-btn";
-        b.dataset.key = m[1].toLowerCase();
-        b.innerText = `${m[1].toUpperCase()}. ${m[2]}`;
-        b.onclick = () => answer(b);
-        opt.appendChild(b);
-      });
+    const questionText = q.questionRaw.split(/\([a-e]\)/i)[0].trim();
+    document.getElementById("question").innerText = questionText;
+
+    const optBox = document.getElementById("options");
+    optBox.innerHTML = "";
+
+    if (!options.length) {
+      optBox.innerHTML =
+        `<div style="font-size:13px;opacity:.7">Options not available</div>`;
+      return;
+    }
+
+    options.forEach(o => {
+      const b = document.createElement("button");
+      b.className = "option-btn";
+      b.dataset.key = o.key;
+      b.innerText = `${o.key.toUpperCase()}. ${o.text}`;
+      b.onclick = () => answer(b);
+      optBox.appendChild(b);
+    });
   }
 
   /* ================= ANSWER ================= */
