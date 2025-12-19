@@ -4,23 +4,21 @@
   <meta charset="UTF-8" />
   <title>Kurafat Engineer</title>
 
-  <!-- Common CSS (Header + Footer + Base styles) -->
+  <!-- Common CSS -->
   <link rel="stylesheet" href="css/common.css" />
 
-  <!-- Home page specific CSS -->
+  <!-- Home page CSS -->
   <link rel="stylesheet" href="css/index.css" />
 
-  <!-- Font Awesome for icons -->
+  <!-- Font Awesome -->
   <link rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 
 <body>
 
-<!-- ================= COMMON HEADER ================= -->
-<header class="site-header">
-  <h1 class="site-title">Kurafat Engineer</h1>
-</header>
+<!-- ================= HEADER (AUTO LOAD) ================= -->
+<div id="header"></div>
 
 <!-- ================= HOME PAGE ================= -->
 <main class="home-page">
@@ -42,44 +40,19 @@
 
 </main>
 
-<!-- ================= COMMON FOOTER ================= -->
-<footer class="site-footer">
+<!-- ================= FOOTER (AUTO LOAD) ================= -->
+<div id="footer"></div>
 
-  <div class="social-links">
-    <a href="https://facebook.com/kurafatengineer" target="_blank">
-      <i class="fab fa-facebook-f"></i>
-    </a>
+<!-- ================= LOAD PARTIALS ================= -->
+<script>
+  fetch("partials/header.html")
+    .then(res => res.text())
+    .then(html => document.getElementById("header").innerHTML = html);
 
-    <a href="https://instagram.com/kurafatengineer" target="_blank">
-      <i class="fab fa-instagram"></i>
-    </a>
-
-    <a href="https://twitter.com/kurafatengineer" target="_blank">
-      <i class="fab fa-twitter"></i>
-    </a>
-
-    <a href="https://wa.me/919001800307" target="_blank">
-      <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <a href="https://snapchat.com/add/kurafatengineer" target="_blank">
-      <i class="fab fa-snapchat-ghost"></i>
-    </a>
-
-    <a href="https://t.me/kurafatengineer" target="_blank">
-      <i class="fab fa-telegram"></i>
-    </a>
-
-    <a href="#" title="Aratai - kurafatengineer">
-      <i class="fas fa-link"></i>
-    </a>
-  </div>
-
-  <p class="footer-text">
-    © 2025 Kurafat Engineer
-  </p>
-
-</footer>
+  fetch("partials/footer.html")
+    .then(res => res.text())
+    .then(html => document.getElementById("footer").innerHTML = html);
+</script>
 
 </body>
 </html>
