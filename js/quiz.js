@@ -188,18 +188,24 @@ function renderQuestion() {
 }
 
 function splitQuestion(text) {
-    const lines = text.split("\n");
-    const qLines = [];
-    const opts = [];
+    if (!text) return { question: "", options: [] };
 
-    lines.forEach(l => {
-        if (l.trim().match(/^\([a-e]\)/i)) opts.push(l.trim());
-        else qLines.push(l);
+    // Normalize line breaks
+    text = text.replace(/\r\n/g, "\n");
+
+    // Extract options (a) to (e)
+    const optionRegex = /\([a-e]\)[\s\S]*?(?=\([a-e]\)|$)/gi;
+    const options = text.match(optionRegex) || [];
+
+    // Remove options from question text
+    let questionText = text;
+    options.forEach(opt => {
+        questionText = questionText.replace(opt, "");
     });
 
     return {
-        question: qLines.join("\n"),
-        options: opts
+        question: questionText.trim(),
+        options: options.map(o => o.trim())
     };
 }
 
