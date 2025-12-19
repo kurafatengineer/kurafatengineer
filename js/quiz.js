@@ -205,4 +205,68 @@ window.filterList = function(input, id) {
     });
 };
 
-});
+
+function checkCompletion() {
+  if (stats.u === 0) {
+    showResult();
+    setTimeout(resetQuiz, 10000);
+  }
+}
+
+/**************** RESULT UI ****************/
+function showResult() {
+  const total = stats.c + stats.i + stats.s + stats.u;
+
+  const deg = x => (x / total) * 360;
+
+  const cDeg = deg(stats.c);
+  const iDeg = cDeg + deg(stats.i);
+  const sDeg = iDeg + deg(stats.s);
+
+  document.getElementById("donutChart").style.background =
+    `conic-gradient(
+      #fff 0deg ${cDeg}deg,
+      #777 ${cDeg}deg ${iDeg}deg,
+      #444 ${iDeg}deg ${sDeg}deg,
+      #222 ${sDeg}deg 360deg
+    )`;
+
+  document.getElementById("r-c").innerText = stats.c;
+  document.getElementById("r-i").innerText = stats.i;
+  document.getElementById("r-s").innerText = stats.s;
+  document.getElementById("r-u").innerText = stats.u;
+
+  document.getElementById("resultOverlay").style.display = "flex";
+}
+
+/**************** RESET ****************/
+function resetQuiz() {
+  document.getElementById("resultOverlay").style.display = "none";
+
+  document.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = false);
+
+  questions = [...allQuestions];
+  index = 0;
+  answered = false;
+  stats = { c: 0, i: 0, s: 0, u: questions.length };
+
+  updateStats();
+  showQuestion();
+}
+
+/* ---------- CALL CHECK AFTER EVERY CHANGE ---------- */
+/* ADD THESE TWO LINES */
+
+const _next = next;
+next = function() {
+  _next();
+  checkCompletion();
+};
+
+const _skip = document.getElementById("skipBtn").onclick;
+document.getElementById("skipBtn").onclick = function() {
+  _skip();
+  checkCompletion();
+};
+
+});  
