@@ -163,26 +163,22 @@ function searchCheckbox(input, boxId) {
   });
 }
 
-/* ================= FINAL OPTION PARSER (YOUR RULE) ================= */
+/* ================= PARSER ================= */
 function parseQuestion(text) {
   if (!text) return { q: "", o: {} };
 
   const lines = text.replace(/\r/g, "").split("\n");
-
   let questionLines = [];
   let options = {};
 
   lines.forEach(line => {
     const m = line.match(/^\(([a-e])\)\s*(.*)$/);
-    if (m) {
-      options[m[1]] = m[2].trim();
-    } else {
-      questionLines.push(line);
-    }
+    if (m) options[m[1]] = m[2].trim();
+    else questionLines.push(line);
   });
 
   return {
-    q: questionLines.join("\n").trim(), // KEEP LINE BREAKS
+    q: questionLines.join("\n").trim(),
     o: options
   };
 }
@@ -207,8 +203,8 @@ function loadQuestion() {
   const parsed = parseQuestion(qObj[currentMedium]);
 
   quizMetaExam.innerText = `${qObj.exam} – ${qObj.year}`;
-  quizMetaSubject.innerText = `${qObj.subject}`;
-  quizMetaPaper.innerText = `${qObj.paper}`;
+  quizMetaPaper.innerText = `Paper: ${qObj.paper}`;
+  quizMetaSubject.innerText = `Subject: ${qObj.subject}`;
 
   question.innerText = parsed.q;
   options.innerHTML = "";
