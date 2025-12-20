@@ -1,277 +1,322 @@
-const SHEET_URL =
-  "https://docs.google.com/spreadsheets/d/1--MzYQ98U_dSVmdDwY-aGAxba2XgiLXJlttJvLPtQvU/gviz/tq?tqx=out:csv";
+/* ================= SOUNDS ================= */
+const correctSound = new Audio(
+  "https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"
+);
+const wrongSound = new Audio(
+  "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
+);
+let soundEnabled = true;
 
-const MAINS_PAPERS = [
-    "GS Paper 01","GS Paper 02","GS Paper 03","GS Paper 04",
-    "Essay","English","Optional 01","Optional 02"
-];
+/* ================= MEDIUM ================= */
+let currentMedium = "en";
 
-let rawData = [];
-let filteredData = [];
-let currentIndex = 0;
-let medium = "English";
-let soundOn = true;
+/* ================= DOM READY ================= */
+document.addEventListener("DOMContentLoaded", () => {
 
-let progress = {
-    C: 0,
-    I: 0,
-    S: 0,
-    U: 0
-};
+  mediumToggleSwitch.onchange = e => {
+    currentMedium = e.target.checked ? "hi" : "en";
+    loadQuestion();
+  };
 
-document.addEventListener("DOMContentLoaded", async () => {
-    await loadHeaderFooter();
-    await loadData();
-    setupToggles();
-    setupMediumToggle();
-    initFilters();
-    applyFilters();
+  soundSwitch.onchange = e => {
+    soundEnabled = e.target.checked;
+  };
+
+  filterToggleSwitch.onchange = e => {
+    filters.style.display = e.target.checked ? "block" : "none";
+  };
+
+  progressToggleSwitch.onchange = e => {
+    progress.style.display = e.target.checked ? "block" : "none";
+  };
+
+  document.querySelectorAll("#filters details").forEach(d => {
+    d.addEventListener("toggle", () => {
+      if (d.open) {
+        document.querySelectorAll("#filters details")
+          .forEach(o => o !== d && (o.open = false));
+      }
+    });
+  });
 });
 
-async function loadHeaderFooter() {
-    document.getElementById("header").innerHTML =
-        await fetch("partials/header.html").then(r => r.text());
-    document.getElementById("footer").innerHTML =
-        await fetch("partials/footer.html").then(r => r.text());
-}
+/* ================= DATA ================= */
+const sheetId = "1--MzYQ98U_dSVmdDwY-aGAxba2XgiLXJlttJvLPtQvU";
+const sheetName = "PYQs";
+const query = encodeURIComponent("SELECT A,B,C,E,K,L,M,N");
+const url =
+  `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${sheetName}&tq=${query}`;
 
-async function loadData() {
-    const csv = await fetch(SHEET_URL).then(r => r.text());
-    const rows = csv.split("\n").map(r => r.split(","));
-    const headers = rows.shift();
+let allQuestions = [];
+let questions = [];
+let progressState = [];
+let current = 0;
 
-    rawData = rows.map(r => ({
-        exam: r[0]?.replace(/"/g,"").split("\n"),
-        year: r[1]?.replace(/"/g,"").split("\n"),
-        paper: r[2]?.replace(/"/g,""),
-        qEn: r[4]?.replace(/"/g,""),
-        qHi: r[10]?.replace(/"/g,""),
-        correct: r[11]?.replace(/"/g,""),
-        subject: r[12]?.replace(/"/g,""),
-        topic: r[13]?.replace(/"/g,""),
-        status: "U"
-    }));
+const filtersMap = {
+  exam: "examBox",
+  year: "yearBox",
+  paper: "paperBox",
+  subject: "subjectBox",
+  topic: "topicBox"
+};
 
-    progress.U = rawData.length;
-}
+/* ================= FETCH + NORMALISATION ================= */
+fetch(url)
+  .then(r => r.text())
+  .then(t => {
+    const json = JSON.parse(t.substring(47).slice(0, -2));
+    allQuestions = [];
 
-function setupToggles() {
-    document.getElementById("filterToggle").onclick = () => {
-        toggleDisplay("filters");
-    };
-    document.getElementById("progressToggle").onclick = () => {
-        toggleDisplay("progress");
-    };
-    document.getElementById("soundToggle").onclick = (e) => {
-        soundOn = !soundOn;
-        e.target.textContent = soundOn ? "Sound: ON" : "Sound: OFF";
-    };
-}
+    json.table.rows.forEach(r => {
 
-function setupMediumToggle() {
-    document.querySelectorAll("input[name='medium']").forEach(r => {
-        r.onchange = () => {
-            medium = r.value;
-            renderQuestion();
-        };
-    });
-}
+      const exams = String(r.c[0]?.v || "")
+        .split(/\n+/).map(x => x.trim()).filter(Boolean);
 
-function initFilters() {
-    document.querySelectorAll(".filter").forEach(filter => {
-        const type = filter.dataset.filter;
-        const values = new Set();
+      const years = String(r.c[1]?.v || "")
+        .split(/\n+/).map(x => x.trim()).filter(Boolean);
 
-        rawData.forEach(d => {
-            if (type === "Year") d.year.forEach(v => values.add(v));
-            if (type === "Exam") d.exam.forEach(v => values.add(v));
-            if (type === "Paper") values.add(d.paper);
-            if (type === "Subject") values.add(d.subject);
-            if (type === "Topic") values.add(d.topic);
+      const paper = String(r.c[2]?.v || "");
+      const en = r.c[3]?.v || "";
+      const hi = r.c[4]?.v || "";
+      const correct = r.c[5]?.v?.toLowerCase() || "";
+      const subject = String(r.c[6]?.v || "");
+      const topic = String(r.c[7]?.v || "");
+
+      exams.forEach((exam, i) => {
+        const year = years[i] || years[0] || "";
+        allQuestions.push({
+          exam, year, paper, en, hi, correct, subject, topic
         });
-
-        const optionsDiv = filter.querySelector(".options");
-        [...values].sort().forEach(v => {
-            const label = document.createElement("label");
-            label.innerHTML = `<input type="checkbox" value="${v}"> ${v}`;
-            optionsDiv.appendChild(label);
-        });
-
-        filter.querySelectorAll("input[type='checkbox']").forEach(cb => {
-            cb.onchange = applyFilters;
-        });
-
-        filter.querySelector("input[type='text']").oninput = e => {
-            const q = e.target.value.toLowerCase();
-            optionsDiv.querySelectorAll("label").forEach(l => {
-                l.style.display = l.textContent.toLowerCase().includes(q)
-                    ? "block" : "none";
-            });
-        };
-    });
-}
-
-function applyFilters() {
-    filteredData = rawData.filter(d => {
-        return matchFilter("Year", d.year) &&
-               matchFilter("Exam", d.exam) &&
-               matchFilter("Paper", [d.paper]) &&
-               matchFilter("Subject", [d.subject]) &&
-               matchFilter("Topic", [d.topic]);
+      });
     });
 
-    resetProgress();
-    currentIndex = 0;
+    updateAllFilters();
+    applyFilters();
+  });
 
-    if (filteredData.length === 0) return;
+/* ================= FILTER HELPERS ================= */
+function getChecked(key) {
+  return [...document.querySelectorAll(`#${filtersMap[key]} input:checked`)]
+    .map(cb => cb.value);
+}
 
-    if (MAINS_PAPERS.includes(filteredData[0].paper)) {
-        showMains();
+function getActiveBase(except = null) {
+  return allQuestions.filter(q =>
+    Object.keys(filtersMap).every(k => {
+      if (k === except) return true;
+      const c = getChecked(k);
+      return !c.length || c.includes(q[k]);
+    })
+  );
+}
+
+/* ================= FILTER UPDATE ================= */
+function updateAllFilters() {
+  Object.keys(filtersMap).forEach(updateFilter);
+}
+
+function updateFilter(key) {
+  const box = document.getElementById(filtersMap[key]);
+  const checked = getChecked(key);
+  const values = [...new Set(
+    getActiveBase(key).map(q => q[key]).filter(Boolean)
+  )];
+
+  values.sort((a, b) =>
+    checked.includes(a) === checked.includes(b)
+      ? a.localeCompare(b)
+      : checked.includes(a) ? -1 : 1
+  );
+
+  box.innerHTML = "";
+  values.forEach(v => {
+    const label = document.createElement("label");
+    label.dataset.value = v.toLowerCase();
+
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.value = v;
+    cb.checked = checked.includes(v);
+    cb.onchange = () => {
+      updateAllFilters();
+      applyFilters();
+    };
+
+    label.append(cb, " " + v);
+    box.append(label, document.createElement("br"));
+  });
+}
+
+/* ================= SEARCH ================= */
+function searchCheckbox(input, boxId) {
+  const txt = input.value.toLowerCase();
+  const box = document.getElementById(boxId);
+  const labels = [...box.querySelectorAll("label")];
+
+  const matched = labels.filter(l => l.dataset.value.includes(txt));
+  const unmatched = labels.filter(l => !l.dataset.value.includes(txt));
+
+  box.innerHTML = "";
+  [...matched, ...unmatched].forEach(l => {
+    l.style.display = matched.includes(l) ? "" : "none";
+    box.append(l, document.createElement("br"));
+  });
+}
+
+/* ================= FINAL OPTION PARSER (YOUR RULE) ================= */
+function parseQuestion(text) {
+  if (!text) return { q: "", o: {} };
+
+  const lines = text.replace(/\r/g, "").split("\n");
+
+  let questionLines = [];
+  let options = {};
+
+  lines.forEach(line => {
+    const m = line.match(/^\(([a-e])\)\s*(.*)$/);
+    if (m) {
+      options[m[1]] = m[2].trim();
     } else {
-        showQuiz();
+      questionLines.push(line);
     }
+  });
+
+  return {
+    q: questionLines.join("\n").trim(), // KEEP LINE BREAKS
+    o: options
+  };
 }
 
-function matchFilter(type, values) {
-    const checked = [...document.querySelectorAll(`.filter[data-filter="${type}"] input[type="checkbox"]:checked`)]
-        .map(cb => cb.value);
-    if (checked.length === 0) return true;
-    return values.some(v => checked.includes(v));
+/* ================= QUIZ ================= */
+function applyFilters() {
+  questions = getActiveBase();
+  current = 0;
+  progressState = Array(questions.length).fill("U");
+
+  progressBar.max = questions.length;
+  progressBar.value = 0;
+
+  loadQuestion();
+  updateProgress();
 }
 
-function showQuiz() {
-    toggleDisplay("quiz", true);
-    toggleDisplay("mains", false);
-    toggleDisplay("progress", true);
-    renderQuestion();
+function loadQuestion() {
+  if (current >= questions.length) return;
+
+  const qObj = questions[current];
+  const parsed = parseQuestion(qObj[currentMedium]);
+
+  quizMetaExam.innerText = `${qObj.exam} – ${qObj.year}`;
+  quizMetaPaper.innerText = `Paper: ${qObj.paper}`;
+
+  question.innerText = parsed.q;
+  options.innerHTML = "";
+
+  Object.keys(parsed.o).forEach(k => {
+    const b = document.createElement("button");
+    b.innerText = `(${k}) ${parsed.o[k]}`;
+    b.onclick = () => answerQuestion(k);
+    options.append(b, document.createElement("br"));
+  });
 }
 
-function showMains() {
-    toggleDisplay("quiz", false);
-    toggleDisplay("progress", false);
-    toggleDisplay("result", false);
-    toggleDisplay("mains", true);
+function answerQuestion(ans) {
+  const isCorrect = ans === questions[current].correct;
 
-    const div = document.getElementById("mainsContent");
-    div.innerHTML = "";
-    filteredData.forEach(d => {
-        const p = document.createElement("p");
-        p.textContent = d.qEn;
-        div.appendChild(p);
-    });
+  if (soundEnabled) {
+    const s = isCorrect ? correctSound : wrongSound;
+    s.currentTime = 0;
+    s.play().catch(() => {});
+  }
+
+  progressState[current] = isCorrect ? "C" : "I";
+  next();
 }
 
-function renderQuestion() {
-    if (!filteredData[currentIndex]) return;
-
-    const q = filteredData[currentIndex];
-    const text = medium === "English" ? q.qEn : q.qHi;
-
-    const parts = splitQuestion(text);
-
-    document.getElementById("quizMeta").textContent =
-        `${q.exam.join(", ")} - ${q.year.join(", ")} | ${q.paper}`;
-
-    document.getElementById("question").textContent = parts.question;
-
-    const optionsDiv = document.getElementById("options");
-    optionsDiv.innerHTML = "";
-
-    parts.options.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.textContent = opt;
-        btn.onclick = () => answer(opt[1].toLowerCase(), q.correct);
-        optionsDiv.appendChild(btn);
-    });
-
-    document.getElementById("skipBtn").onclick = skip;
-}
-
-function splitQuestion(text) {
-    if (!text) return { question: "", options: [] };
-
-    // Normalize line breaks
-    text = text.replace(/\r\n/g, "\n");
-
-    // Extract options (a) to (e)
-    const optionRegex = /\([a-e]\)[\s\S]*?(?=\([a-e]\)|$)/gi;
-    const options = text.match(optionRegex) || [];
-
-    // Remove options from question text
-    let questionText = text;
-    options.forEach(opt => {
-        questionText = questionText.replace(opt, "");
-    });
-
-    return {
-        question: questionText.trim(),
-        options: options.map(o => o.trim())
-    };
-}
-
-function answer(selected, correct) {
-    const q = filteredData[currentIndex];
-    q.status = selected === correct ? "C" : "I";
-    next();
-}
-
-function skip() {
-    filteredData[currentIndex].status = "S";
-    next();
+function skipQuestion() {
+  progressState[current] = "S";
+  next();
 }
 
 function next() {
-    currentIndex++;
-    updateProgress();
-
-    if (progress.U === 0) {
-        showResult();
-    } else {
-        renderQuestion();
-    }
+  current++;
+  updateProgress();
+  progressState.every(p => p !== "U")
+    ? showResult()
+    : loadQuestion();
 }
 
-function resetProgress() {
-    progress = { C:0, I:0, S:0, U:filteredData.length };
-    filteredData.forEach(d => d.status = "U");
-    updateProgress();
-}
-
+/* ================= PROGRESS ================= */
 function updateProgress() {
-    progress = { C:0, I:0, S:0, U:0 };
-    filteredData.forEach(d => progress[d.status]++);
-    document.getElementById("progressStats").textContent =
-        `C:${progress.C} I:${progress.I} S:${progress.S} U:${progress.U}`;
+  let c = { C: 0, I: 0, S: 0, U: 0 };
+  progressState.forEach(p => c[p]++);
+
+  counts.innerText =
+    `Correct: ${c.C} | Incorrect: ${c.I} | Skipped: ${c.S} | Unattempted: ${c.U}`;
+
+  progressBar.value = c.C + c.I + c.S;
 }
 
+/* ================= RESULT ================= */
 function showResult() {
-    ["filters","quiz","progress","mains","toggles"].forEach(id => toggleDisplay(id,false));
-    toggleDisplay("result", true);
-    drawChart();
+  title.style.display = "none";
+  controls.style.display = "none";
+  filters.style.display = "none";
+  quiz.style.display = "none";
+  progress.style.display = "none";
+  document.querySelectorAll("hr").forEach(hr => hr.style.display = "none");
 
-    document.getElementById("restart").onclick = () => location.reload();
+  resultCard.style.display = "block";
+  drawDonut();
 }
 
-function drawChart() {
-    const ctx = document.getElementById("resultChart").getContext("2d");
-    const total = progress.C + progress.I + progress.S + progress.U;
-    let start = 0;
+resultCard.onclick = restartQuiz;
 
-    [["C","green"],["I","red"],["S","orange"],["U","gray"]].forEach(([k,color]) => {
-        const val = progress[k] / total * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(150,150);
-        ctx.arc(150,150,140,start,start+val);
-        ctx.fillStyle = color;
-        ctx.fill();
-        start += val;
-    });
+function restartQuiz() {
+  resultCard.style.display = "none";
+
+  title.style.display = "block";
+  controls.style.display = "block";
+  filters.style.display = filterToggleSwitch.checked ? "block" : "none";
+  quiz.style.display = "block";
+  progress.style.display = progressToggleSwitch.checked ? "block" : "none";
+  document.querySelectorAll("hr").forEach(hr => hr.style.display = "block");
+
+  currentMedium = "en";
+  mediumToggleSwitch.checked = false;
+
+  soundEnabled = true;
+  soundSwitch.checked = true;
+
+  document.querySelectorAll("#filters input")
+    .forEach(i => i.type === "checkbox" ? i.checked = false : i.value = "");
+
+  updateAllFilters();
+  applyFilters();
 }
 
-function toggleDisplay(id, show) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.style.display = show === undefined
-        ? (el.style.display === "none" ? "block" : "none")
-        : (show ? "block" : "none");
+/* ================= DONUT ================= */
+function drawDonut() {
+  const ctx = donut.getContext("2d");
+  ctx.clearRect(0, 0, 220, 220);
+
+  let c = { C: 0, I: 0, S: 0 };
+  progressState.forEach(p => p !== "U" && c[p]++);
+
+  const total = c.C + c.I + c.S;
+  let angle = -Math.PI / 2;
+
+  [
+    { v: c.C, col: "#4CAF50" },
+    { v: c.I, col: "#F44336" },
+    { v: c.S, col: "#FFC107" }
+  ].forEach(d => {
+    const slice = (d.v / total) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(110, 110);
+    ctx.arc(110, 110, 90, angle, angle + slice);
+    ctx.fillStyle = d.col;
+    ctx.fill();
+    angle += slice;
+  });
 }
