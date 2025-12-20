@@ -1,86 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>PYQs Quiz</title>
-    <link rel="stylesheet" href="css/common.css">
+  <meta charset="UTF-8">
+  <title>UPSC PYQs Quiz</title>
 </head>
 <body>
 
-<div id="header"></div>
+<h2 id="title">UPSC Previous Year Questions Quiz</h2>
 
-<!-- SECTION B : TOGGLES -->
-<section id="toggles">
-    <button id="filterToggle">Toggle Filters</button>
-    <button id="soundToggle">Sound: ON</button>
-    <button id="progressToggle">Toggle Progress</button>
+<!-- ===== TOGGLES ===== -->
+<div id="controls">
 
+  <p>
+    <b>Question Medium:</b>
     <label>
-        <input type="radio" name="medium" value="English" checked> English
+      <input type="checkbox" id="mediumToggleSwitch">
+      Hindi
     </label>
+  </p>
+
+  <p>
+    <b>Sound:</b>
     <label>
-        <input type="radio" name="medium" value="Hindi"> Hindi
+      <input type="checkbox" id="soundSwitch" checked>
+      Enable
     </label>
-</section>
+  </p>
 
-<!-- SECTION A : FILTERS -->
-<section id="filters">
-    <h3 id="filterHeader">Filters</h3>
+  <p>
+    <b>Show Filters:</b>
+    <label>
+      <input type="checkbox" id="filterToggleSwitch" checked>
+      Show
+    </label>
+  </p>
 
-    <div class="filter" data-filter="Year">
-        <input type="text" placeholder="Search Year">
-        <div class="options"></div>
-    </div>
+  <p>
+    <b>Show Progress:</b>
+    <label>
+      <input type="checkbox" id="progressToggleSwitch" checked>
+      Show
+    </label>
+  </p>
 
-    <div class="filter" data-filter="Exam">
-        <input type="text" placeholder="Search Exam">
-        <div class="options"></div>
-    </div>
+</div>
 
-    <div class="filter" data-filter="Topic">
-        <input type="text" placeholder="Search Topic">
-        <div class="options"></div>
-    </div>
+<hr>
 
-    <div class="filter" data-filter="Paper">
-        <input type="text" placeholder="Search Paper">
-        <div class="options"></div>
-    </div>
+<!-- ===== FILTERS ===== -->
+<div id="filters">
 
-    <div class="filter" data-filter="Subject">
-        <input type="text" placeholder="Search Subject">
-        <div class="options"></div>
-    </div>
-</section>
+  <details>
+    <summary><b>Exam</b></summary>
+    <input type="text" placeholder="Search" onkeyup="searchCheckbox(this,'examBox')"><br>
+    <div id="examBox"></div>
+  </details>
 
-<!-- SECTION C : QUIZ -->
-<section id="quiz">
-    <div id="quizMeta"></div>
-    <div id="question"></div>
-    <div id="options"></div>
-    <button id="skipBtn">Skip</button>
-</section>
+  <details>
+    <summary><b>Year</b></summary>
+    <input type="text" placeholder="Search" onkeyup="searchCheckbox(this,'yearBox')"><br>
+    <div id="yearBox"></div>
+  </details>
 
-<!-- SECTION D : MAINS -->
-<section id="mains" style="display:none;">
-    <h2>Mains Questions</h2>
-    <div id="mainsContent"></div>
-</section>
+  <details>
+    <summary><b>Paper</b></summary>
+    <input type="text" placeholder="Search" onkeyup="searchCheckbox(this,'paperBox')"><br>
+    <div id="paperBox"></div>
+  </details>
 
-<!-- SECTION E : PROGRESS -->
-<section id="progress">
-    <h3>Progress</h3>
-    <div id="progressStats"></div>
-</section>
+  <details>
+    <summary><b>Subject</b></summary>
+    <input type="text" placeholder="Search" onkeyup="searchCheckbox(this,'subjectBox')"><br>
+    <div id="subjectBox"></div>
+  </details>
 
-<!-- SECTION F : RESULT -->
-<section id="result" style="display:none;">
-    <canvas id="resultChart" width="300" height="300"></canvas>
-    <p id="restart">Click to Restart</p>
-</section>
+  <details>
+    <summary><b>Topic</b></summary>
+    <input type="text" placeholder="Search" onkeyup="searchCheckbox(this,'topicBox')"><br>
+    <div id="topicBox"></div>
+  </details>
 
-<div id="footer"></div>
+</div>
 
-<script src="js/quiz.js"></script>
+<hr>
+
+<!-- ===== QUIZ ===== -->
+<div id="quiz">
+  <div id="quizMetaExam"></div>
+  <div id="quizMetaPaper"></div>
+
+  <h3 id="question"></h3>
+  <div id="options"></div>
+  <br>
+  <button onclick="skipQuestion()">Skip</button>
+</div>
+
+<hr>
+
+<!-- ===== PROGRESS ===== -->
+<div id="progress">
+  <progress id="progressBar" value="0" max="0"></progress>
+  <p id="counts"></p>
+</div>
+
+<!-- ===== RESULT ===== -->
+<div id="resultCard" style="display:none; cursor:pointer;">
+  <h3>Quiz Result</h3>
+  <p>(Click anywhere to Restart)</p>
+  <canvas id="donut" width="220" height="220"></canvas>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
