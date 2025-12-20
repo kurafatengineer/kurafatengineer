@@ -8,87 +8,60 @@
 
 <h2 id="title">UPSC Previous Year Questions Quiz</h2>
 
-<!-- ===== TOGGLES ===== -->
 <div id="controls">
-
   <p>
     <b>Question Medium:</b>
-    <label>
-      <input type="checkbox" id="mediumToggleSwitch">
-      Hindi
-    </label>
+    <label><input type="checkbox" id="mediumToggleSwitch"> Hindi</label>
   </p>
-
   <p>
     <b>Sound:</b>
-    <label>
-      <input type="checkbox" id="soundSwitch" checked>
-      Enable
-    </label>
+    <label><input type="checkbox" id="soundSwitch" checked> Enable</label>
   </p>
-
   <p>
     <b>Show Filters:</b>
-    <label>
-      <input type="checkbox" id="filterToggleSwitch" checked>
-      Show
-    </label>
+    <label><input type="checkbox" id="filterToggleSwitch" checked> Show</label>
   </p>
-
   <p>
     <b>Show Progress:</b>
-    <label>
-      <input type="checkbox" id="progressToggleSwitch" checked>
-      Show
-    </label>
+    <label><input type="checkbox" id="progressToggleSwitch" checked> Show</label>
   </p>
-
 </div>
 
 <hr>
 
-<!-- ===== FILTERS ===== -->
 <div id="filters">
-
-  <details>
-    <summary><b>Exam</b></summary>
+  <details><summary><b>Exam</b></summary>
     <input type="text" placeholder="Search" onkeyup="searchCheckbox(this,'examBox')"><br>
     <div id="examBox"></div>
   </details>
 
-  <details>
-    <summary><b>Year</b></summary>
+  <details><summary><b>Year</b></summary>
     <input type="text" placeholder="Search" onkeyup="searchCheckbox(this,'yearBox')"><br>
     <div id="yearBox"></div>
   </details>
 
-  <details>
-    <summary><b>Paper</b></summary>
+  <details><summary><b>Paper</b></summary>
     <input type="text" placeholder="Search" onkeyup="searchCheckbox(this,'paperBox')"><br>
     <div id="paperBox"></div>
   </details>
 
-  <details>
-    <summary><b>Subject</b></summary>
+  <details><summary><b>Subject</b></summary>
     <input type="text" placeholder="Search" onkeyup="searchCheckbox(this,'subjectBox')"><br>
     <div id="subjectBox"></div>
   </details>
 
-  <details>
-    <summary><b>Topic</b></summary>
+  <details><summary><b>Topic</b></summary>
     <input type="text" placeholder="Search" onkeyup="searchCheckbox(this,'topicBox')"><br>
     <div id="topicBox"></div>
   </details>
-
 </div>
 
 <hr>
 
-<!-- ===== QUIZ ===== -->
 <div id="quiz">
   <div id="quizMetaExam"></div>
   <div id="quizMetaPaper"></div>
-  <div id=" quizMetaSubject"></div>
+  <div id="quizMetaSubject"></div>
 
   <h3 id="question"></h3>
   <div id="options"></div>
@@ -98,13 +71,11 @@
 
 <hr>
 
-<!-- ===== PROGRESS ===== -->
 <div id="progress">
   <progress id="progressBar" value="0" max="0"></progress>
   <p id="counts"></p>
 </div>
 
-<!-- ===== RESULT ===== -->
 <div id="resultCard" style="display:none; cursor:pointer;">
   <h3>Quiz Result</h3>
   <p>(Click anywhere to Restart)</p>
