@@ -207,7 +207,8 @@ function loadQuestion() {
   const parsed = parseQuestion(qObj[currentMedium]);
 
   quizMetaExam.innerText = `${qObj.exam} – ${qObj.year}`;
-  quizMetaPaper.innerText = `Paper: ${qObj.paper}`;
+  quizMetaSubject.innerText = `${qObj.subject}`;
+  quizMetaPaper.innerText = `${qObj.paper}`;
 
   question.innerText = parsed.q;
   options.innerHTML = "";
